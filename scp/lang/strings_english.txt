@@ -1,0 +1,16 @@
+<?php
+/* 
+------------------
+Language: English
+------------------
+*/
+
+#$lang = array();
+
+# Group commands menuitems
+$window_title = 'HD Test';
+
+$main_title = 'Welcome';
+$main_title2 = 'Move2';
+$main_title3 = 'Move3';
+?>

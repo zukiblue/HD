@@ -98,7 +98,6 @@ class StaffNav {
             $this->tabs=array();
             $this->tabs['dashboard']=array('desc'=>'Dashboard','href'=>'dashboard.php','title'=>'Staff Dashboard');
             $this->tabs['tickets']=array('desc'=>'Tickets','href'=>'tickets.php','title'=>'Ticket Queue');
-            $this->tabs['kbase']=array('desc'=>'Knowledgebase','href'=>'kb.php','title'=>'Knowledgebase');
         }
 
         return $this->tabs;
@@ -132,15 +131,6 @@ class StaffNav {
                     $subnav[]=array('desc'=>'Staff&nbsp;Directory','href'=>'directory.php','iconclass'=>'teams');
                     $subnav[]=array('desc'=>'My&nbsp;Profile','href'=>'profile.php','iconclass'=>'users');
                     break;
-                case 'kbase':
-                    $subnav[]=array('desc'=>'FAQs','href'=>'kb.php', 'urls'=>array('faq.php'), 'iconclass'=>'kb');
-                    if($staff) {
-                        if($staff->canManageFAQ())
-                            $subnav[]=array('desc'=>'Categories','href'=>'categories.php','iconclass'=>'faq-categories');
-                        if($staff->canManageCannedResponses())
-                            $subnav[]=array('desc'=>'Canned&nbsp;Responses','href'=>'canned.php','iconclass'=>'canned');
-                    }
-                   break;
             }
             if($subnav)
                 $submenus[$this->getPanel().'.'.strtolower($k)]=$subnav;
@@ -174,8 +164,6 @@ class AdminNav extends StaffNav{
             $tabs=array();
             $tabs['dashboard']=array('desc'=>'Dashboard','href'=>'logs.php','title'=>'Admin Dashboard');
             $tabs['settings']=array('desc'=>'Settings','href'=>'settings.php','title'=>'System Settings');
-            $tabs['manage']=array('desc'=>'Manage','href'=>'helptopics.php','title'=>'Manage Options');
-            $tabs['emails']=array('desc'=>'Emails','href'=>'emails.php','title'=>'Email Settings');
             $tabs['staff']=array('desc'=>'Staff','href'=>'staff.php','title'=>'Manage Staff');
             $this->tabs=$tabs;
         }
@@ -195,24 +183,6 @@ class AdminNav extends StaffNav{
                 case 'settings':
                     $subnav[]=array('desc'=>'System&nbsp;Preferences','href'=>'settings.php?t=system','iconclass'=>'preferences');
                     $subnav[]=array('desc'=>'Tickets','href'=>'settings.php?t=tickets','iconclass'=>'ticket-settings');
-                    $subnav[]=array('desc'=>'Emails','href'=>'settings.php?t=emails','iconclass'=>'email-settings');
-                    $subnav[]=array('desc'=>'Knowledgebase','href'=>'settings.php?t=kb','iconclass'=>'kb-settings');
-                    $subnav[]=array('desc'=>'Autoresponder','href'=>'settings.php?t=autoresp','iconclass'=>'email-autoresponders');
-                    $subnav[]=array('desc'=>'Alerts&nbsp;&amp;&nbsp;Notices','href'=>'settings.php?t=alerts','iconclass'=>'alert-settings');
-                    break;
-                case 'manage':
-                    $subnav[]=array('desc'=>'Help&nbsp;Topics','href'=>'helptopics.php','iconclass'=>'helpTopics');
-                    $subnav[]=array('desc'=>'Ticket&nbsp;Filters','href'=>'filters.php',
-                                        'title'=>'Ticket&nbsp;Filters','iconclass'=>'ticketFilters');
-                    $subnav[]=array('desc'=>'SLA&nbsp;Plans','href'=>'slas.php','iconclass'=>'sla');
-                    $subnav[]=array('desc'=>'API&nbsp;Keys','href'=>'apikeys.php','iconclass'=>'api');
-                    break;
-                case 'emails':
-                    $subnav[]=array('desc'=>'Emails','href'=>'emails.php', 'title'=>'Email Addresses', 'iconclass'=>'emailSettings');
-                    $subnav[]=array('desc'=>'Banlist','href'=>'banlist.php',
-                                        'title'=>'Banned&nbsp;Emails','iconclass'=>'emailDiagnostic');
-                    $subnav[]=array('desc'=>'Templates','href'=>'templates.php','title'=>'Email Templates','iconclass'=>'emailTemplates');
-                    $subnav[]=array('desc'=>'Diagnostic','href'=>'emailtest.php', 'title'=>'Email Diagnostic', 'iconclass'=>'emailDiagnostic');
                     break;
                 case 'staff':
                     $subnav[]=array('desc'=>'Staff&nbsp;Members','href'=>'staff.php','iconclass'=>'users');

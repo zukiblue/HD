@@ -57,7 +57,7 @@ define('ROOT_PATH','../');
 define('ROOT_DIR','../');
 define('INCLUDE_DIR',ROOT_DIR.'include/');
 define('PEAR_DIR',INCLUDE_DIR.'pear/');
-ini_set('include_path', './'.PATH_SEPARATOR.INC_DIR.PATH_SEPARATOR.INCLUDE_DIR.PATH_SEPARATOR.PEAR_DIR);
+//ini_set('include_path', './'.PATH_SEPARATOR.INC_DIR.PATH_SEPARATOR.INCLUDE_DIR.PATH_SEPARATOR.PEAR_DIR);
 endif;
 
 #required files

@@ -1,5 +1,8 @@
 <?php
-if(!defined('OSTADMININC') || !$thisstaff || !$thisstaff->isAdmin()) die('Access Denied');
+// Protect from direct request
+if(basename($_SERVER['SCRIPT_NAME'])==basename(__FILE__)) die('Access denied.');
+// Protect from non admin users
+if(!defined('OSTADMININC') || !$thisstaff || !$thisstaff->isAdmin()) die('Access denied @ '.basename(__FILE__));
 
 $qstr='';
 

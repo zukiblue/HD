@@ -49,7 +49,6 @@ class osTicket {
     function osTicket($cfgId) {
         
         $this->config = Config::lookup($cfgId);
-
         //DB based session storage was added starting with v1.7
         if($this->config && !$this->getConfig()->getDBVersion())
             $this->session = osTicketSession::start(SESSION_TTL); // start DB based session

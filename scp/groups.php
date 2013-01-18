@@ -1,24 +1,12 @@
 <?php
-/*********************************************************************
-    groups.php
-
-    User Groups.
-
-    Peter Rotich <peter@osticket.com>
-    Copyright (c)  2006-2012 osTicket
-    http://www.osticket.com
-
-    Released under the GNU General Public License WITHOUT ANY WARRANTY.
-    See LICENSE.TXT for details.
-
-    vim: expandtab sw=4 ts=4 sts=4:
-**********************************************************************/
-require('admin.inc.php');
+require_once('core.php');
 $group=null;
+
 if($_REQUEST['id'] && !($group=Group::lookup($_REQUEST['id'])))
     $errors['err']='Unknown or invalid group ID.';
-
-if($_POST){
+/*
+ // Editing
+ if($_POST){
     switch(strtolower($_POST['do'])){
         case 'update':
             if(!$group){
@@ -93,13 +81,21 @@ if($_POST){
             break;
     }
 }
-
-$page='groups.inc.php';
+*/
+// valid group - and adding
 if($group || ($_REQUEST['a'] && !strcasecmp($_REQUEST['a'],'add')))
     $page='group.inc.php';
+else
+    $page='groups.inc.php';
 
 $nav->setTabActive('staff');
+
 require(STAFFINC_DIR.'header.inc.php');
-require(STAFFINC_DIR.$page);
+
+if(!defined('OSTADMININC') || !$thisstaff || !$thisstaff->isAdmin())
+    echo 'Access Denied.'; 
+else {    
+    require(STAFFINC_DIR.$page);
+}
 include(STAFFINC_DIR.'footer.inc.php');
 ?>

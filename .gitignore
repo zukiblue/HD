@@ -5,3 +5,4 @@ include/ost-config.php
 .DS_Store
 .vagrant
 Vagrantfile
+/nbproject/private/

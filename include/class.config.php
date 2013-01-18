@@ -39,7 +39,8 @@ class Config {
         $sql='SELECT *, (TIME_TO_SEC(TIMEDIFF(NOW(), UTC_TIMESTAMP()))/3600) as db_tz_offset '
             .' FROM '.CONFIG_TABLE
             .' WHERE id='.db_input($id);
-        
+        //die($sql);
+
         if(!($res=db_query($sql)) || !db_num_rows($res))
             return false;
 

@@ -13,8 +13,9 @@
 
     vim: expandtab sw=4 ts=4 sts=4:
 **********************************************************************/
-require_once('../main.inc.php');
-if(!defined('INCLUDE_DIR')) die('Fatal Error. Kwaheri!');
+#require_once('../main.inc.php');
+require_once('core.php');
+if(!defined('INCLUDE_DIR')) die('Access Denied.');
 
 require_once(INCLUDE_DIR.'class.staff.php');
 require_once(INCLUDE_DIR.'class.csrf.php');
