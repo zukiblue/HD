@@ -1,7 +1,7 @@
 <HTML>
     <BODY>
     <CENTER>
-        <IMG src="images/website_builder.jpg">
+        <IMG src="img/website_builder.jpg">
         <BR>
         <FONT style="font-family: Arial; font-size:50px; font-weight:bold">Our Site is</FONT>  <BR>
         <FONT style="font-family: Arial; font-size:50px; font-weight:bold">OFFLINE</FONT>  <BR><BR>

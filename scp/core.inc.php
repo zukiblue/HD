@@ -1,10 +1,6 @@
 <?php  
 if(basename($_SERVER['SCRIPT_NAME'])==basename(__FILE__)) die('Access denied.');
 
-if ( file_exists( 'offline.php' ) && !isset( $_GET['admin'] ) ) {
-	include( 'offline.php' );
-	exit;
-}
 // Stats - for page request time
 $g_request_time = microtime(true);
 
@@ -37,11 +33,13 @@ define('UPGRADE_DIR', INCLUDE_DIR.'upgrader/');
 define('SQL_DIR', UPGRADE_DIR.'sql/');// realpath(dirname(__FILE__))).'/'); #Get real path for root dir ---linux and windows
 
 // Set include paths
+$class_path  = $rootpath.'classes'.$d;
 $include_path  = $rootpath.'..'.$d.'include'.$d;
 $include_path2 = $rootpath.'include'.$d;
 $include_pear  = $rootpath.'..'.$d.'include'.$d.'/pear'.$d;
 
-$path = array($include_path,
+$path = array($class_path,
+              $include_path,
               $include_path2,
               $include_pear,
               get_include_path()
@@ -49,7 +47,7 @@ $path = array($include_path,
 set_include_path( implode( PATH_SEPARATOR, $path ) ); // ';' on Win, ':' on Linux,...
 
 // Unset global variables that are no longer needed.
-unset( $d, $rootpath, $include_path, $include_path2, $include_pear, $path );
+unset( $d, $rootpath, $class_path, $include_path, $include_path2, $include_pear, $path );
    
 //// OLD main.inc.php
 //commented
@@ -178,6 +176,7 @@ if(!function_exists('staffLoginPage')) { //Ajax interface can pre-declare the fu
 }
 
 $thisstaff = new StaffSession($_SESSION['_staff']['userID']); //Set staff object.
+die(var_dump($thisstaff->isValid()));
 //1) is the user Logged in for real && is staff.
 if(!$thisstaff || !is_object($thisstaff) || !$thisstaff->getId() || !$thisstaff->isValid()){
     $msg=(!$thisstaff || !$thisstaff->isValid())?'Authentication Required':'Session timed out due to inactivity';

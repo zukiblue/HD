@@ -17,8 +17,7 @@
 
     vim: expandtab sw=4 ts=4 sts=4:
 **********************************************************************/
-
-require_once(INCLUDE_DIR.'class.config.php'); //Config helper
+require_once('../scp/classes/config.class.php'); //Config helper NEW
 require_once(INCLUDE_DIR.'class.csrf.php'); //CSRF token class.
 
 define('LOG_WARN',LOG_WARNING);

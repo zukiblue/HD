@@ -1,5 +1,10 @@
 <?php
 require('core.inc.php');
+
+if ( file_exists( 'offline.php' ) && !isset( $_GET['admin'] ) ) {
+	include( 'offline.php' );
+	exit;
+}
 //Make sure config is loaded and the staff is set and of admin type
 /*
  if(!$ost or !$thisstaff or !$thisstaff->isAdmin()){
