@@ -1,8 +1,8 @@
 <?php
 // Protect from direct request
-if(basename($_SERVER['SCRIPT_NAME'])==basename(__FILE__)) die('Access denied.');
+if(basename($_SERVER['SCRIPT_NAME'])==basename(__FILE__)) die('Access denied @'.basename(__FILE__));
 // Protect from non admin users
-if(!defined('OSTADMININC') || !$thisstaff || !$thisstaff->isAdmin()) die('Access denied @ '.basename(__FILE__));
+if(!defined('OSTADMININC') || !$user || !$user->isAdmin()) die('Access denied @ '.basename(__FILE__));
 
 $qstr='';
 
@@ -83,7 +83,7 @@ else
                 <td>&nbsp;<?php echo $row['group_enabled']?'Active':'<b>Disabled</b>'; ?></td>
                 <td style="text-align:right;padding-right:30px">&nbsp;&nbsp;
                     <?php if($row['users']>0) { ?>
-                        <a href="staff.php?gid=<?php echo $row['group_id']; ?>"><?php echo $row['users']; ?></a>
+                        <a href="users.php?gid=<?php echo $row['group_id']; ?>"><?php echo $row['users']; ?></a>
                     <?php }else{ ?> 0
                     <?php } ?>
                     &nbsp;

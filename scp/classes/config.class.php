@@ -1,6 +1,33 @@
 <?php
 require_once(INCLUDE_DIR.'class.email.php');
 
+function getvar ($var) {
+    if (isset ($$var)) {
+       return ($$var);
+    }
+    // NOT SET - get from global
+    return config_get_global($var);   
+}
+
+
+# ----------------------
+# force config variable from a global to avoid recursion
+function config_get_global( $p_option, $p_default = null ) {
+	global $g_cache_config_eval;
+	if( isset( $GLOBALS['g_' . $p_option] ) ) {
+		$t_value = $GLOBALS['g_' . $p_option];
+		return $t_value;
+	} else {
+		# unless we were allowing for the option not to exist by passing
+		#  a default, trigger a WARNING
+		/*if( null === $p_default ) {
+			error_parameters( $p_option );
+			trigger_error( ERROR_CONFIG_OPT_NOT_FOUND, WARNING );
+		}*/
+		return '';
+	}
+}
+
 class Config {
     
     var $id = 0;
@@ -878,5 +905,12 @@ class Config {
     function lookup($id) {
         return ($id && ($cfg = new Config($id)) && $cfg->getId()==$id)?$cfg:null;
     }
+    
+    
+    function getlang() {
+    
+        return true;
+    }
+
 }
 ?>

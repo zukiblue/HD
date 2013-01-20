@@ -164,7 +164,7 @@ class AdminNav extends StaffNav{
             $tabs=array();
             $tabs['dashboard']=array('desc'=>'Dashboard','href'=>'logs.php','title'=>'Admin Dashboard');
             $tabs['settings']=array('desc'=>'Settings','href'=>'settings.php','title'=>'System Settings');
-            $tabs['staff']=array('desc'=>'Staff','href'=>'staff.php','title'=>'Manage Staff');
+            $tabs['staff']=array('desc'=>'Staff','href'=>'users.php','title'=>'Manage Staff');
             $this->tabs=$tabs;
         }
 

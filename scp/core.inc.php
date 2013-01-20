@@ -1,5 +1,5 @@
 <?php  
-if(basename($_SERVER['SCRIPT_NAME'])==basename(__FILE__)) die('Access denied.');
+if(basename($_SERVER['SCRIPT_NAME'])==basename(__FILE__)) die('Access denied..');
 
 // Stats - for page request time
 $g_request_time = microtime(true);
@@ -51,7 +51,8 @@ unset( $d, $rootpath, $class_path, $include_path, $include_path2, $include_pear,
    
 //// OLD main.inc.php
 //commented
-/*    #Disable Globals if enabled....before loading config info
+/*
+    #Disable Globals if enabled....before loading config info
     if(ini_get('register_globals')) {
        ini_set('register_globals',0);
        foreach($_REQUEST as $key=>$val)
@@ -69,6 +70,7 @@ unset( $d, $rootpath, $class_path, $include_path, $include_path2, $include_pear,
     session_cache_limiter('nocache');
     #Cookies
     //ini_set('session.cookie_path','/osticket/');
+*/
 
     #Error reporting...Good idea to ENABLE error reporting to a file. i.e display_errors should be set to false
     $error_reporting = E_ALL & ~E_NOTICE;
@@ -78,19 +80,24 @@ unset( $d, $rootpath, $class_path, $include_path, $include_path2, $include_pear,
         $error_reporting &= ~(E_DEPRECATED | E_USER_DEPRECATED);
     error_reporting($error_reporting); //Respect whatever is set in php.ini (sysadmin knows better??)
     #Don't display errors
-    ini_set('display_errors',1);
-    ini_set('display_startup_errors',1);
-*/
+//    ini_set('display_errors',1);
+//    ini_set('display_startup_errors',1);
 
     # Verify if is installed, if not redirect to install.php
     if ( false === $config_inc_found ) {
             header('Location: '.ROOT_PATH.'setup/');
     }
-    
+    # Load internationalization functions (needed before database_api, in case database connection fails)
+    require_once( 'language.inc.php' );
+    if ( !isset( $g_skip_lang_load ) ) {
+    //    lang_load( lang_get_default() );
+        lang_load( 'english' );   
+    }
+   
     #include required files
     require('class.osticket.php');
     require('class.ostsession.php');
-    require(INCLUDE_DIR.'class.usersession.php');
+    #require(INCLUDE_DIR.'class.usersession.php');
     require(INCLUDE_DIR.'class.pagenate.php'); //Pagenate helper!
     require(INCLUDE_DIR.'class.log.php');
     require(INCLUDE_DIR.'class.mcrypt.php');
@@ -107,6 +114,10 @@ unset( $d, $rootpath, $class_path, $include_path, $include_path2, $include_pear,
     define('THISPAGE', Misc::currentURL());
     define('THISURI', $_SERVER['REQUEST_URI']);
 
+    # Start anonymous (if active)
+    if ( !isset( $g_login_anonymous ) ) {
+	$g_login_anonymous = true;
+    }
   
     #Connect to the DB && get configuration from database
     $ferror=null;
@@ -120,7 +131,7 @@ unset( $d, $rootpath, $class_path, $include_path, $include_path2, $include_pear,
         $msg=$ferror."\n\n".THISPAGE;
         Mailer::sendmail(ADMIN_EMAIL, 'osTicket Fatal Error', $msg, sprintf('"osTicket Alerts"<%s>', ADMIN_EMAIL));
         //Display generic error to the user
-        die("<b>Fatal Error:</b> Contact system administrator.". $msg);
+        die("<b>Fatal Error:</b> Contact system administrator. ". $msg);
         exit;
     }
     
@@ -132,11 +143,11 @@ unset( $d, $rootpath, $class_path, $include_path, $include_path2, $include_pear,
     define('DEFAULT_PAGE_LIMIT', $cfg->getPageSize()?$cfg->getPageSize():25);
 
     #Cleanup magic quotes crap.
-    if(function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc()) {
+/*    if(function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc()) {
         $_POST=Format::strip_slashes($_POST);
         $_GET=Format::strip_slashes($_GET);
         $_REQUEST=Format::strip_slashes($_REQUEST);
-    }
+    }*/
 //// END Old main.inc
 
 if(!defined('INCLUDE_DIR')) die('Fatal error... invalid setting.');
@@ -150,13 +161,12 @@ define('OSTSCPINC',TRUE);
 define('OSTSTAFFINC',TRUE);
 
 /* Tables used by staff only */
-define('KB_PREMADE_TABLE',TABLE_PREFIX.'kb_premade');
+// define('KB_PREMADE_TABLE',TABLE_PREFIX.'kb_premade');
 
 
 /* include what is needed on staff control panel */
-
-require_once(INCLUDE_DIR.'class.staff.php');
-require_once(INCLUDE_DIR.'class.group.php');
+require_once('user.class.php');
+require_once('group.class.php');
 require_once(INCLUDE_DIR.'class.nav.php');
 require_once(INCLUDE_DIR.'class.csrf.php');
 
@@ -166,8 +176,8 @@ require_once(INCLUDE_DIR.'class.csrf.php');
 */
 
 
-if(!function_exists('staffLoginPage')) { //Ajax interface can pre-declare the function to  trap expired sessions.
-    function staffLoginPage($msg) {
+if(!function_exists('LoginPage')) { //Ajax interface can pre-declare the function to  trap expired sessions.
+    function LoginPage($msg) {
         $_SESSION['_staff']['auth']['dest']=THISURI;
         $_SESSION['_staff']['auth']['msg']=$msg;
         require(SCP_DIR.'login.php');
@@ -175,19 +185,24 @@ if(!function_exists('staffLoginPage')) { //Ajax interface can pre-declare the fu
     }
 }
 
-$thisstaff = new StaffSession($_SESSION['_staff']['userID']); //Set staff object.
-die(var_dump($thisstaff->isValid()));
+$user = new User($_SESSION['_staff']['userID']); //Set staff object.
+#$dologin=0;
+#if(!$user || !is_object($user) || !$user->getId() || !$user->isValid()){
+
 //1) is the user Logged in for real && is staff.
-if(!$thisstaff || !is_object($thisstaff) || !$thisstaff->getId() || !$thisstaff->isValid()){
-    $msg=(!$thisstaff || !$thisstaff->isValid())?'Authentication Required':'Session timed out due to inactivity';
-    staffLoginPage($msg);
+//if (user-)
+if(!$user || !is_object($user) || !$user->getId() || !$user->isValid()){
+    $msg=(!$user || !$user->isValid())?'Authentication Required':'Session timed out due to inactivity';
+    LoginPage($msg);
     exit;
 }
+die("aaaa");
+
 //2) if not super admin..check system status and group status
-if(!$thisstaff->isAdmin()) {
+/*if(!$user->isAdmin()) {
     //Check for disabled staff or group!
-    if(!$thisstaff->isactive() || !$thisstaff->isGroupActive()) {
-        staffLoginPage('Access Denied. Contact Admin');
+    if(!$user->isactive() || !$user->isGroupActive()) {
+        LoginPage('Access Denied. Contact Admin');
         exit;
     }
 
@@ -197,9 +212,10 @@ if(!$thisstaff->isAdmin()) {
         exit;
     }
 }
+ * */
 
 //Keep the session activity alive
-$thisstaff->refreshSession();
+$user->refreshSession();
 
 /******* CSRF Protectin *************/
 // Enforce CSRF protection for POSTS
@@ -213,10 +229,10 @@ $ost->addExtraHeader('<meta name="csrf_token" content="'.$ost->getCSRFToken().'"
 
 /******* SET STAFF DEFAULTS **********/
 //Set staff's timezone offset.
-$_SESSION['TZ_OFFSET']=$thisstaff->getTZoffset();
-$_SESSION['TZ_DST']=$thisstaff->observeDaylight();
+$_SESSION['TZ_OFFSET']=$user->getTZoffset();
+$_SESSION['TZ_DST']=$user->observeDaylight();
 
-define('PAGE_LIMIT', $thisstaff->getPageLimit()?$thisstaff->getPageLimit():DEFAULT_PAGE_LIMIT);
+define('PAGE_LIMIT', $user->getPageLimit()?$user->getPageLimit():DEFAULT_PAGE_LIMIT);
 
 //Clear some vars. we use in all pages.
 $errors=array();
@@ -234,9 +250,9 @@ if($ost->isUpgradePending() && !$exempt) {
     $sysnotice.=' <a href="settings.php">Enable</a>.';
 }
 
-$nav = new StaffNav($thisstaff);
+$nav = new StaffNav($user);
 //Check for forced password change.
-if($thisstaff->forcePasswdChange() && !$exempt) {
+if($user->forcePasswdChange() && !$exempt) {
     # XXX: Call staffLoginPage() for AJAX and API requests _not_ to honor
     #      the request
     $sysnotice = 'Password change required to continue';
@@ -245,5 +261,4 @@ if($thisstaff->forcePasswdChange() && !$exempt) {
 }
 $ost->setWarning($sysnotice);
 $ost->setPageTitle('osTicket :: Staff Control Panel');
-
 ?>

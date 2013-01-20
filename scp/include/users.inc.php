@@ -1,5 +1,8 @@
 <?php
-if(!defined('OSTADMININC') || !$thisstaff || !$thisstaff->isAdmin()) die('Access Denied');
+// Protect from direct request
+if(basename($_SERVER['SCRIPT_NAME'])==basename(__FILE__)) die('Access denied @'.basename(__FILE__));
+// Protect from non admin users
+if(!defined('OSTADMININC') || !$user || !$user->isAdmin()) die('Access denied @ '.basename(__FILE__));
 $qstr='';
 $select='SELECT staff.*,CONCAT_WS(" ",firstname,lastname) as name, grp.group_name, dept.dept_name as dept,count(m.team_id) as teams ';
 $from='FROM '.STAFF_TABLE.' staff '.
@@ -48,15 +51,15 @@ $order_by="$order_column $order ";
 $total=db_count('SELECT count(DISTINCT staff.staff_id) '.$from.' '.$where);
 $page=($_GET['p'] && is_numeric($_GET['p']))?$_GET['p']:1;
 $pageNav=new Pagenate($total,$page,PAGE_LIMIT);
-$pageNav->setURL('staff.php',$qstr.'&sort='.urlencode($_REQUEST['sort']).'&order='.urlencode($_REQUEST['order']));
+$pageNav->setURL('users.php',$qstr.'&sort='.urlencode($_REQUEST['sort']).'&order='.urlencode($_REQUEST['order']));
 //Ok..lets roll...create the actual query
 $qstr.='&order='.($order=='DESC'?'ASC':'DESC');
 $query="$select $from $where GROUP BY staff.staff_id ORDER BY $order_by LIMIT ".$pageNav->getStart().",".$pageNav->getLimit();
 //echo $query;
 ?>
-<h2>Staff Members</h2>
+<h2><?php lang('users_title'); ?></h2>
 <div style="width:700; float:left;">
-    <form action="staff.php" method="GET" name="filter">
+    <form action="users.php" method="GET" name="filter">
      <input type="hidden" name="a" value="filter" >
         <select name="did" id="did">
              <option value="0">&mdash; All Department &mdash;</option>
@@ -106,16 +109,16 @@ $query="$select $from $where GROUP BY staff.staff_id ORDER BY $order_by LIMIT ".
         <input type="submit" name="submit" value="Apply"/>
     </form>
  </div>
-<div style="float:right;text-align:right;padding-right:5px;"><b><a href="staff.php?a=add" class="Icon newstaff">Add New Staff</a></b></div>
+<div style="float:right;text-align:right;padding-right:5px;"><b><a href="users.php?a=add" class="Icon newstaff">Add New Staff</a></b></div>
 <div class="clear"></div>
 <?php
 $res=db_query($query);
 if($res && ($num=db_num_rows($res)))        
     $showing=$pageNav->showing();
 else
-    $showing='No staff found!';
+    $showing='No user found!';
 ?>
-<form action="staff.php" method="POST" name="staff" >
+<form action="users.php" method="POST" name="staff" >
  <?php csrf_token(); ?>
  <input type="hidden" name="do" value="mass_process" >
  <input type="hidden" id="action" name="a" value="" >
@@ -124,13 +127,13 @@ else
     <thead>
         <tr>
             <th width="7px">&nbsp;</th>        
-            <th width="200"><a <?php echo $name_sort; ?> href="staff.php?<?php echo $qstr; ?>&sort=name">Name</a></th>
-            <th width="100"><a <?php echo $username_sort; ?> href="staff.php?<?php echo $qstr; ?>&sort=username">UserName</a></th>
-            <th width="100"><a  <?php echo $status_sort; ?> href="staff.php?<?php echo $qstr; ?>&sort=status">Status</a></th>
-            <th width="120"><a  <?php echo $group_sort; ?>href="staff.php?<?php echo $qstr; ?>&sort=group">Group</a></th>
-            <th width="150"><a  <?php echo $dept_sort; ?>href="staff.php?<?php echo $qstr; ?>&sort=dept">Department</a></th>
-            <th width="100"><a <?php echo $created_sort; ?> href="staff.php?<?php echo $qstr; ?>&sort=created">Created</a></th>
-            <th width="145"><a <?php echo $login_sort; ?> href="staff.php?<?php echo $qstr; ?>&sort=login">Last Login</a></th>
+            <th width="200"><a <?php echo $name_sort; ?> href="users.php?<?php echo $qstr; ?>&sort=name">Name</a></th>
+            <th width="100"><a <?php echo $username_sort; ?> href="users.php?<?php echo $qstr; ?>&sort=username">UserName</a></th>
+            <th width="100"><a  <?php echo $status_sort; ?> href="users.php?<?php echo $qstr; ?>&sort=status">Status</a></th>
+            <th width="120"><a  <?php echo $group_sort; ?>href="users.php?<?php echo $qstr; ?>&sort=group">Group</a></th>
+            <th width="150"><a  <?php echo $dept_sort; ?>href="users.php?<?php echo $qstr; ?>&sort=dept">Department</a></th>
+            <th width="100"><a <?php echo $created_sort; ?> href="users.php?<?php echo $qstr; ?>&sort=created">Created</a></th>
+            <th width="145"><a <?php echo $login_sort; ?> href="users.php?<?php echo $qstr; ?>&sort=login">Last Login</a></th>
         </tr>
     </thead>
     <tbody>
@@ -145,7 +148,7 @@ else
                <tr id="<?php echo $row['staff_id']; ?>">
                 <td width=7px>
                   <input type="checkbox" class="ckb" name="ids[]" value="<?php echo $row['staff_id']; ?>" <?php echo $sel?'checked="checked"':''; ?> >
-                <td><a href="staff.php?id=<?php echo $row['staff_id']; ?>"><?php echo Format::htmlchars($row['name']); ?></a>&nbsp;</td>
+                <td><a href="users.php?id=<?php echo $row['staff_id']; ?>"><?php echo Format::htmlchars($row['name']); ?></a>&nbsp;</td>
                 <td><?php echo $row['username']; ?></td>
                 <td><?php echo $row['isactive']?'Active':'<b>Locked</b>'; ?>&nbsp;<?php echo $row['onvacation']?'<small>(<i>vacation</i>)</small>':''; ?></td>
                 <td><a href="groups.php?id=<?php echo $row['group_id']; ?>"><?php echo Format::htmlchars($row['group_name']); ?></a></td>

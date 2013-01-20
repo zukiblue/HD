@@ -2,6 +2,9 @@
 require_once('core.php');
 $group=null;
 
+//auth_reauthenticate();
+//access_ensure_global_level( config_get( 'manage_site_threshold' ) );
+
 if($_REQUEST['id'] && !($group=Group::lookup($_REQUEST['id'])))
     $errors['err']='Unknown or invalid group ID.';
 /*
@@ -92,10 +95,10 @@ $nav->setTabActive('staff');
 
 require(STAFFINC_DIR.'header.inc.php');
 
-if(!defined('OSTADMININC') || !$thisstaff || !$thisstaff->isAdmin())
-    echo 'Access Denied.'; 
+if(!defined('OSTADMININC') || !$user|| !$user->isAdmin())
+    echo 'Access Denied'; 
 else {    
-    require(STAFFINC_DIR.$page);
+    require($page);
 }
 include(STAFFINC_DIR.'footer.inc.php');
 ?>

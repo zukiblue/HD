@@ -15,7 +15,7 @@
 **********************************************************************/
 
 include_once(INCLUDE_DIR.'class.client.php');
-include_once(INCLUDE_DIR.'class.staff.php');
+#include_once(INCLUDE_DIR.'class.staff.php');
 
 
 class UserSession {

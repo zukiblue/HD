@@ -41,9 +41,20 @@
     ?>
     <div id="header">
         <a href="index.php" id="logo">osTicket - Customer Support System</a>
-        <p id="info">Howdy, <strong><?php echo $thisstaff->getUserName(); ?></strong>
+        <?php 
+        	if( !db_is_connected() ) {
+		return;
+	}
+
+	if( auth_is_user_authenticated() ) {
+		echo "LOGGEDIN AS Guest.";
+	}
+
+        ?>
+        
+        <p id="info">Howdy, <strong><?php echo $user->getUserName(); ?></strong>
            <?php
-            if($thisstaff->isAdmin() && !defined('ADMINPAGE')) { ?>
+            if($user->isAdmin() && !defined('ADMINPAGE')) { ?>
             | <a href="admin.php">Admin Panel</a>
             <?php }else{ ?>
             | <a href="index.php">Staff Panel</a>

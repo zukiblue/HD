@@ -2,8 +2,114 @@
 include_once(INCLUDE_DIR.'class.ticket.php');
 include_once(INCLUDE_DIR.'class.dept.php');
 include_once(INCLUDE_DIR.'class.team.php');
-include_once(INCLUDE_DIR.'class.group.php');
+include_once('group.class.php');
 include_once(INCLUDE_DIR.'class.passwd.php');
+
+$g_script_login_cookie = null;
+$g_cache_anonymous_user_cookie_string = null;
+$g_cache_cookie_valid = null;
+#$g_cache_current_user_id = null;
+
+/**
+ * Return true if there is a currently logged in and authenticated user, false otherwise
+ *
+ * @param boolean auto-login anonymous user
+ * @return bool
+ * @access public
+ */
+function auth_is_user_authenticated() {
+	global $g_cache_cookie_valid, $g_login_anonymous;
+	if( $g_cache_cookie_valid == true ) {
+		return $g_cache_cookie_valid;
+	}
+//	$g_cache_cookie_valid = auth_is_cookie_valid( auth_get_current_user_cookie( $g_login_anonymous ) );
+	$g_cache_cookie_valid = auth_get_current_user_cookie( $g_login_anonymous );
+	return $g_cache_cookie_valid;
+}
+
+function get_current_user_cookie( $p_login_anonymous=true ) {
+	global $g_script_login_cookie, $g_cache_anonymous_user_cookie_string;
+
+	# if logging in via a script, return that cookie
+	if( $g_script_login_cookie !== null ) {
+		return $g_script_login_cookie;
+	}
+
+	# fetch user cookie
+	#$t_cookie_name = config_get( 'string_cookie' );
+	#$t_cookie = gpc_get_cookie( $t_cookie_name, '' );
+
+	# if cookie not found, and anonymous login enabled, use cookie of anonymous account.
+	if( is_blank( $t_cookie ) ) {
+		if( $p_login_anonymous && ON == getvar( 'allowanonymouslogin' ) ) {
+			if( $g_cache_anonymous_user_cookie_string === null ) {
+				if( function_exists( 'db_is_connected' ) && db_is_connected() ) {
+
+					# get anonymous information if database is available
+					$query = 'SELECT id, cookie_string FROM ' . db_get_table( 'mantis_user_table' ) . ' WHERE username = ' . db_param();
+					$result = db_query_bound( $query, Array( getvar( 'anonymousaccount' ) ) );
+
+					if( 1 == db_num_rows( $result ) ) {
+						$row = db_fetch_array( $result );
+						$t_cookie = $row['cookie_string'];
+
+						$g_cache_anonymous_user_cookie_string = $t_cookie;
+						$g_cache_current_user_id = $row['id'];
+					}
+				}
+			} else {
+				$t_cookie = $g_cache_anonymous_user_cookie_string;
+			}
+		}
+	}
+
+	return $t_cookie;
+}
+
+/**
+ * Generate a string to use as the identifier for the login cookie
+ * It is not guaranteed to be unique and should be checked
+ * The string returned should be 64 characters in length
+ * @return string 64 character cookie string
+ * @access public
+ */
+function generate_cookie_string() {
+	$t_val = mt_rand( 0, mt_getrandmax() ) + mt_rand( 0, mt_getrandmax() );
+	$t_val = md5( $t_val ) . md5( time() );
+	return $t_val;
+}
+
+function isCookieValid( $cookie_string ) {
+	global $g_cache_current_user_id;
+
+	// fail if DB isn't accessible
+	if( !db_is_connected() ) {
+		return false;
+	}
+
+	// fail if cookie is blank
+	if( '' === $cookie_string ) {
+		return false;
+	}
+
+	// succeeed if user has already been authenticated
+	/*if( null !== $g_cache_current_user_id ) {
+		return true;
+	}*/
+
+	# look up cookie in the database to see if it is valid
+	$query = 'SELECT *  FROM '.STAFF_TABLE.'
+		  WHERE cookie_string=' . db_input($cookie_string);
+	$result = db_query();
+
+	# return true if a matching cookie was found
+	if( 1 == db_num_rows( $result ) ) {
+		//user_cache_database_result( db_fetch_array( $result ) );
+		return true;
+	} else {
+		return false;
+	}
+}
 
 class User {
     
@@ -16,9 +122,13 @@ class User {
     var $teams;
     var $timezone;
     var $stats;
-    
+    // from StaffSession  parent::Staff, now User
+    var $session;
+
     function User($var) {
-        $this->id =0;
+        $this->id = null;
+        // from StaffSession  parent::Staff, now User
+        $this->session= new User_Session($var);
         return ($this->load($var));
     }
 
@@ -550,7 +660,7 @@ class User {
     }
 
     function lookup($id) {
-        return ($id && is_numeric($id) && ($staff= new Staff($id)) && $staff->getId()==$id)?$staff:null;
+        return ($id && is_numeric($id) && ($user= new User($id)) && $user->getId()==$id)?$user:null;
     }
 
     function login($username, $passwd, &$errors, $strike=true) {
@@ -572,24 +682,24 @@ class User {
             $errors['err'] = 'Username and password required';
 
         if($errors) return false;
-   
-        if(($user=new StaffSession(trim($username))) && $user->getId() && $user->check_passwd($passwd)) {
+   echo $this->getId();
+        if(($session=new User_Session(trim($username))) && $this->getId() /*&& $this->check_passwd($passwd)*/) {
             //update last login && password reset stuff.
             $sql='UPDATE '.STAFF_TABLE.' SET lastlogin=NOW() ';
-            if($user->isPasswdResetDue() && !$user->isAdmin())
+            if($this->isPasswdResetDue() && !$this->isAdmin())
                 $sql.=',change_passwd=1';
-            $sql.=' WHERE staff_id='.db_input($user->getId());
+            $sql.=' WHERE staff_id='.db_input($this->getId());
             db_query($sql);
             //Now set session crap and lets roll baby!
             $_SESSION['_staff'] = array(); //clear.
             $_SESSION['_staff']['userID'] = $username;
-            $user->refreshSession(); //set the hash.
-            $_SESSION['TZ_OFFSET'] = $user->getTZoffset();
-            $_SESSION['TZ_DST'] = $user->observeDaylight();
+            $this->refreshSession(); //set the hash.
+            $_SESSION['TZ_OFFSET'] = $this->getTZoffset();
+            $_SESSION['TZ_DST'] = $this->observeDaylight();
 
             //Log debug info.
-            $ost->logDebug('Staff login', 
-                    sprintf("%s logged in [%s]", $user->getUserName(), $_SERVER['REMOTE_ADDR'])); //Debug.
+            $ost->logDebug('User login', 
+                    sprintf("%s logged in [%s]", $this->getUserName(), $_SERVER['REMOTE_ADDR'])); //Debug.
 
             //Regenerate session id.
             $sid=session_id(); //Current id
@@ -598,7 +708,7 @@ class User {
             if(($session=$ost->getSession()) && is_object($session) && $sid!=session_id())
                 $session->destroy($sid);
         
-            return $user;
+            return $this;
         }
     
         //If we get to this point we know the login failed.
@@ -701,7 +811,8 @@ class User {
             .' ,phone_ext='.db_input($vars['phone_ext'])
             .' ,mobile="'.db_input(Format::phone($vars['mobile']),false).'"'
             .' ,signature='.db_input($vars['signature'])
-            .' ,notes='.db_input($vars['notes']);
+            .' ,notes='.db_input($vars['notes'])
+            .' ,cookie="'.generate_cookie_string().'"';
             
         if($vars['passwd1'])
             $sql.=' ,passwd='.db_input(Passwd::hash($vars['passwd1']));
@@ -725,5 +836,119 @@ class User {
 
         return false;
     }
+
+    
+    // from StaffSession  parent::Staff, now User
+    function isValid(){
+        global $_SESSION,$cfg;
+        if(!$this->getId() || $this->session->getSessionId()!=session_id())
+            return false;
+        
+        return $this->session->isvalidSession($_SESSION['_staff']['token'],$cfg->getStaffTimeout(),$cfg->enableStaffIPBinding())?true:false;
+    }
+
+    function refreshSession(){
+        global $_SESSION;
+        $_SESSION['_staff']['token']=$this->getSessionToken();
+    }
+    
+    function getSession() {
+        return $this->session;
+    }
+
+    function getSessionToken() {
+        return $this->session->sessionToken();
+    }
+    
+    function getIP(){
+        return $this->session->getIP();
+    }
+
 }
-?>
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+class User_Session {
+   var $session_id = '';
+   var $userID='';
+   var $browser = '';
+   var $ip = '';
+   var $validated=FALSE;
+
+   function User_Session($userid){
+      $this->browser=(!empty($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : $_ENV['HTTP_USER_AGENT'];
+      $this->ip=(!empty($_SERVER['REMOTE_ADDR'])) ? $_SERVER['REMOTE_ADDR'] : getenv('REMOTE_ADDR');
+      $this->session_id=session_id();
+      $this->userID=$userid;
+   }
+
+   function isStaff(){
+       return FALSE;
+   }
+
+   function isClient() {
+       return FALSE;
+   }
+
+
+   function getSessionId(){
+       return $this->session_id;
+   }
+
+   function getIP(){
+        return  $this->ip;
+   }
+
+   function getBrowser(){
+       return $this->browser;
+   }
+   function refreshSession(){
+       //nothing to do...clients need to worry about it.
+   }
+
+   function sessionToken(){
+
+      $time  = time();
+      $hash  = md5($time.SESSION_SECRET.$this->userID);
+      $token = "$hash:$time:".MD5($this->ip);
+
+      return($token);
+   }
+
+   function isvalidSession($htoken,$maxidletime=0,$checkip=false){
+        global $cfg;
+       
+        $token = rawurldecode($htoken);
+        
+        #check if we got what we expected....
+        if($token && !strstr($token,":"))
+            return FALSE;
+        
+        #get the goodies
+        list($hash,$expire,$ip)=explode(":",$token);
+        
+        #Make sure the session hash is valid
+        if((md5($expire . SESSION_SECRET . $this->userID)!=$hash)){
+            return FALSE;
+        }
+        #is it expired??
+        
+        
+        if($maxidletime && ((time()-$expire)>$maxidletime)){
+            return FALSE;
+        }
+        #Make sure IP is still same ( proxy access??????)
+        if($checkip && strcmp($ip, MD5($this->ip)))
+            return FALSE;
+
+        $this->validated=TRUE;
+
+        return TRUE;
+   }
+
+   function isValid() {
+        return FALSE;
+   }
+
+}?>

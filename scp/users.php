@@ -1,46 +1,33 @@
 <?php
-/*********************************************************************
-    staff.php
+require_once('core.php');
+$user=null;
 
-    Evertything about staff members.
-
-    Peter Rotich <peter@osticket.com>
-    Copyright (c)  2006-2012 osTicket
-    http://www.osticket.com
-
-    Released under the GNU General Public License WITHOUT ANY WARRANTY.
-    See LICENSE.TXT for details.
-
-    vim: expandtab sw=4 ts=4 sts=4:
-**********************************************************************/
-require('admin.inc.php');
-$staff=null;
-if($_REQUEST['id'] && !($staff=Staff::lookup($_REQUEST['id'])))
-    $errors['err']='Unknown or invalid staff ID.';
-
+if($_REQUEST['id'] && !($user=User::lookup($_REQUEST['id'])))
+    $errors['err']='Unknown or invalid user ID.';
+/*
 if($_POST){
     switch(strtolower($_POST['do'])){
         case 'update':
-            if(!$staff){
-                $errors['err']='Unknown or invalid staff.';
-            }elseif($staff->update($_POST,$errors)){
-                $msg='Staff updated successfully';
+            if(!user){
+                $errors['err']='Unknown or invalid user.';
+            }elseif($user->update($_POST,$errors)){
+                $msg='User updated successfully';
             }elseif(!$errors['err']){
-                $errors['err']='Unable to update staff. Correct any error(s) below and try again!';
+                $errors['err']='Unable to update user. Correct any error(s) below and try again!';
             }
             break;
         case 'create':
-            if(($id=Staff::create($_POST,$errors))){
+            if(($id=User::create($_POST,$errors))){
                 $msg=Format::htmlchars($_POST['name']).' added successfully';
                 $_REQUEST['a']=null;
             }elseif(!$errors['err']){
-                $errors['err']='Unable to add staff. Correct any error(s) below and try again.';
+                $errors['err']='Unable to add user. Correct any error(s) below and try again.';
             }
             break;
         case 'mass_process':
             if(!$_POST['ids'] || !is_array($_POST['ids']) || !count($_POST['ids'])) {
-                $errors['err'] = 'You must select at least one staff member.';
-            } elseif(in_array($thisstaff->getId(),$_POST['ids'])) {
+                $errors['err'] = 'You must select at least one user.';
+            } elseif(in_array($user->getId(),$_POST['ids'])) {
                 $errors['err'] = 'You can not disable/delete yourself - you could be the only admin!';
             } else {
                 $count=count($_POST['ids']);
@@ -51,11 +38,11 @@ if($_POST){
 
                         if(db_query($sql) && ($num=db_affected_rows())) {
                             if($num==$count)
-                                $msg = 'Selected staff activated';
+                                $msg = 'Selected user activated';
                             else
-                                $warn = "$num of $count selected staff activated";
+                                $warn = "$num of $count selected user activated";
                         } else {
-                            $errors['err'] = 'Unable to activate selected staff';
+                            $errors['err'] = 'Unable to activate selected user';
                         }
                         break;
                     case 'disable':
@@ -64,11 +51,11 @@ if($_POST){
 
                         if(db_query($sql) && ($num=db_affected_rows())) {
                             if($num==$count)
-                                $msg = 'Selected staff disabled';
+                                $msg = 'Selected user disabled';
                             else
-                                $warn = "$num of $count selected staff disabled";
+                                $warn = "$num of $count selected user disabled";
                         } else {
-                            $errors['err'] = 'Unable to disable selected staff';
+                            $errors['err'] = 'Unable to disable selected user';
                         }
                         break;
                     case 'delete':
@@ -78,11 +65,11 @@ if($_POST){
                         }
 
                         if($i && $i==$count)
-                            $msg = 'Selected staff deleted successfully';
+                            $msg = 'Selected user deleted successfully';
                         elseif($i>0)
-                            $warn = "$i of $count selected staff deleted";
+                            $warn = "$i of $count selected user deleted";
                         elseif(!$errors['err'])
-                            $errors['err'] = 'Unable to delete selected staff.';
+                            $errors['err'] = 'Unable to delete selected user.';
                         break;
                     default:
                         $errors['err'] = 'Unknown action. Get technical help!';
@@ -95,13 +82,20 @@ if($_POST){
             break;
     }
 }
-
-$page='staffmembers.inc.php';
-if($staff || ($_REQUEST['a'] && !strcasecmp($_REQUEST['a'],'add')))
-    $page='staff.inc.php';
+*/
+if($user || ($_REQUEST['a'] && !strcasecmp($_REQUEST['a'],'add')))
+    $page='user.inc.php';
+else
+    $page='users.inc.php';
 
 $nav->setTabActive('staff');
+
 require(STAFFINC_DIR.'header.inc.php');
-require(STAFFINC_DIR.$page);
+
+if(!defined('OSTADMININC') || !$user|| !$user->isAdmin())
+    echo 'Access Denied'; 
+else {    
+    require($page);
+}
 include(STAFFINC_DIR.'footer.inc.php');
 ?>

@@ -91,7 +91,6 @@ function lang_exists( $key, $language ) {
  *  2. The string in English
  */
 function getlang( $key, $language = null ) {
-    //return $key;
 	global $languagestrings;
 # $P_string » key
 	# If no specific language is requested, we'll
@@ -126,6 +125,10 @@ function getlang( $key, $language = null ) {
 			return lang_get( $p_string, 'english' );
 		}
 	}
+}
+
+function lang( $key, $language = null ) {
+    echo getlang( $key, $language);
 }
 /*
 

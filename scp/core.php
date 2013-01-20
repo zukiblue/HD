@@ -14,6 +14,7 @@ if ( file_exists( 'offline.php' ) && !isset( $_GET['admin'] ) ) {
     exit;
 }
 */
+
 //Define some constants.
 define('OSTADMININC',TRUE); //checked by admin include files
 define('ADMINPAGE',TRUE);   //Used by the header to swap menus.
