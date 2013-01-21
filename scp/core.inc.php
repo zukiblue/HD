@@ -163,7 +163,6 @@ define('OSTSTAFFINC',TRUE);
 /* Tables used by staff only */
 // define('KB_PREMADE_TABLE',TABLE_PREFIX.'kb_premade');
 
-
 /* include what is needed on staff control panel */
 require_once('user.class.php');
 require_once('group.class.php');

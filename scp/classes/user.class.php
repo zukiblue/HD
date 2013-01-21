@@ -27,6 +27,59 @@ function auth_is_user_authenticated() {
 	return $g_cache_cookie_valid;
 }
 
+/**
+ * Return the current user login cookie string,
+ * note that the cookie cached by a script login superceeds the cookie provided by
+ *  the browser. This shouldn't normally matter, except that the password verification uses
+ *  this routine to bypass the normal authentication, and can get confused when a normal user
+ *  logs in, then runs the verify script. the act of fetching config variables may get the wrong
+ *  userid.
+ * if no user is logged in and anonymous login is enabled, returns cookie for anonymous user
+ * otherwise returns '' (an empty string)
+ *
+ * @param boolean auto-login anonymous user
+ * @return string current user login cookie string
+ * @access public
+ */
+function auth_get_current_user_cookie( $p_login_anonymous=true ) {
+	global $g_script_login_cookie, $g_cache_anonymous_user_cookie_string;
+
+	# if logging in via a script, return that cookie
+	if( $g_script_login_cookie !== null ) {
+		return $g_script_login_cookie;
+	}
+
+	# fetch user cookie
+	//$t_cookie_name = config_get( 'string_cookie' );
+	//$t_cookie = gpc_get_cookie( $t_cookie_name, '' );
+
+	# if cookie not found, and anonymous login enabled, use cookie of anonymous account.
+	if( is_blank( $t_cookie ) ) {
+		if( $p_login_anonymous && ON == config_get( 'allow_anonymous_login' ) ) {
+			if( $g_cache_anonymous_user_cookie_string === null ) {
+				if( function_exists( 'db_is_connected' ) && db_is_connected() ) {
+
+					# get anonymous information if database is available
+					$query = 'SELECT id, cookie_string FROM ' . db_get_table( 'mantis_user_table' ) . ' WHERE username = ' . db_param();
+					$result = db_query_bound( $query, Array( config_get( 'anonymous_account' ) ) );
+
+					if( 1 == db_num_rows( $result ) ) {
+						$row = db_fetch_array( $result );
+						$t_cookie = $row['cookie_string'];
+
+						$g_cache_anonymous_user_cookie_string = $t_cookie;
+						$g_cache_current_user_id = $row['id'];
+					}
+				}
+			} else {
+				$t_cookie = $g_cache_anonymous_user_cookie_string;
+			}
+		}
+	}
+
+	return $t_cookie;
+}
+
 function get_current_user_cookie( $p_login_anonymous=true ) {
 	global $g_script_login_cookie, $g_cache_anonymous_user_cookie_string;
 
@@ -126,10 +179,17 @@ class User {
     var $session;
 
     function User($var) {
-        $this->id = null;
+        $this->id = null;            
         // from StaffSession  parent::Staff, now User
         $this->session= new User_Session($var);
-        return ($this->load($var));
+	
+        global $g_login_anonymous, $g_anonymousaccount;
+/*        if ($g_login_anonymous==1) {
+        }
+        else {
+        $this->load($var)
+  */
+        return false;// ( $this->load($var) );
     }
 
     function load($var='') {
@@ -154,14 +214,14 @@ class User {
         $this->departments = $this->stats = array();
 
         //WE have to patch info here to support upgrading from old versions.
-        if(($time=strtotime($this->ht['passwdreset']?$this->ht['passwdreset']:$this->ht['added'])))
+  /*      if(($time=strtotime($this->ht['passwdreset']?$this->ht['passwdreset']:$this->ht['added'])))
             $this->ht['passwd_change'] = time()-$time; //XXX: check timezone issues.
 
         if($this->ht['timezone_id'])
             $this->ht['tz_offset'] = Timezone::getOffsetById($this->ht['timezone_id']);
         elseif($this->ht['timezone_offset'])
             $this->ht['tz_offset'] = $this->ht['timezone_offset'];
-
+*/
         return ($this->id);
     }
 
@@ -617,7 +677,7 @@ class User {
         return $num;
     }
 
-    /**** Static functions ********/
+    /**** Stati functions ********/
     function getStaffMembers($availableonly=false) {
 
         $sql='SELECT s.staff_id,CONCAT_WS(", ",s.lastname, s.firstname) as name '
@@ -682,8 +742,8 @@ class User {
             $errors['err'] = 'Username and password required';
 
         if($errors) return false;
-   echo $this->getId();
-        if(($session=new User_Session(trim($username))) && $this->getId() /*&& $this->check_passwd($passwd)*/) {
+       // die ($this->getId());
+        if(($session=new User_Session(trim($username))) && (!$this->getId()==0) /*&& $this->check_passwd($passwd)*/) {
             //update last login && password reset stuff.
             $sql='UPDATE '.STAFF_TABLE.' SET lastlogin=NOW() ';
             if($this->isPasswdResetDue() && !$this->isAdmin())
