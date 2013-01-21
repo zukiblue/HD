@@ -190,12 +190,18 @@ $user = new User($_SESSION['_staff']['userID']); //Set staff object.
 
 //1) is the user Logged in for real && is staff.
 //if (user-)
+//echo 'User:<Br />';
+//echo print_r($user).'....<Br />';
+//echo 'getId: '.$user->getId().'....<Br />';
+//echo 'isValid: '.print_r($user->isValid()).'....<Br />';;
+//echo 'SESSION: '.$_SESSION['_staff']['userID'];
+//die ('io');
 if(!$user || !is_object($user) || !$user->getId() || !$user->isValid()){
     $msg=(!$user || !$user->isValid())?'Authentication Required':'Session timed out due to inactivity';
     LoginPage($msg);
     exit;
 }
-die("aaaa");
+//die("aaaa");
 
 //2) if not super admin..check system status and group status
 /*if(!$user->isAdmin()) {

@@ -189,7 +189,7 @@ class User {
         else {
         $this->load($var)
   */
-        return false;// ( $this->load($var) );
+        return ( $this->load($var) );
     }
 
     function load($var='') {
@@ -228,7 +228,11 @@ class User {
     function reload() {
         return $this->load();
     }
-
+    
+    function isAuthenticated() {
+        return false;
+    }
+    
     function asVar() {
         return $this->getName();
     }
@@ -298,6 +302,7 @@ class User {
     }
 
     function getId() {
+      //  echo 'ID: '.$this->id.'....';
         return $this->id;
     }
 
@@ -742,7 +747,8 @@ class User {
             $errors['err'] = 'Username and password required';
 
         if($errors) return false;
-       // die ($this->getId());
+       
+         die('now'.print_r($this->getId()));
         if(($session=new User_Session(trim($username))) && (!$this->getId()==0) /*&& $this->check_passwd($passwd)*/) {
             //update last login && password reset stuff.
             $sql='UPDATE '.STAFF_TABLE.' SET lastlogin=NOW() ';
@@ -770,7 +776,7 @@ class User {
         
             return $this;
         }
-    
+       
         //If we get to this point we know the login failed.
         $_SESSION['_staff']['strikes']+=1;
         if(!$errors && $_SESSION['_staff']['strikes']>$cfg->getStaffMaxLogins()) {
