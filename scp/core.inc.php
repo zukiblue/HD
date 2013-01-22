@@ -183,6 +183,8 @@ if(!function_exists('LoginPage')) { //Ajax interface can pre-declare the functio
         exit;
     }
 }
+echo session_id().'....<Br />';
+echo print_r($user).'....<Br /><Br />';
 
 $user = new User($_SESSION['_staff']['userID']); //Set staff object.
 #$dologin=0;
@@ -191,11 +193,11 @@ $user = new User($_SESSION['_staff']['userID']); //Set staff object.
 //1) is the user Logged in for real && is staff.
 //if (user-)
 //echo 'User:<Br />';
-//echo print_r($user).'....<Br />';
+echo print_r($user).'....<Br />';
 //echo 'getId: '.$user->getId().'....<Br />';
 //echo 'isValid: '.print_r($user->isValid()).'....<Br />';;
 //echo 'SESSION: '.$_SESSION['_staff']['userID'];
-//die ('io');
+die ('io');
 if(!$user || !is_object($user) || !$user->getId() || !$user->isValid()){
     $msg=(!$user || !$user->isValid())?'Authentication Required':'Session timed out due to inactivity';
     LoginPage($msg);

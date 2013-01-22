@@ -165,7 +165,7 @@ function isCookieValid( $cookie_string ) {
 }
 
 class User {
-    
+    var $tm;
     var $ht;
     var $id;
 
@@ -179,6 +179,7 @@ class User {
     var $session;
 
     function User($var) {
+        $this->tm = microtime(true);
         $this->id = null;            
         // from StaffSession  parent::Staff, now User
         $this->session= new User_Session($var);
