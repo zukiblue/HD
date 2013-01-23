@@ -10,7 +10,7 @@ class User {
         $this->loginattempts_username = '';
         $this->loginattempts_total = 0;
     }
-    
+    /*
     function Login()
     {
         if(empty($_POST['username']))
@@ -39,7 +39,7 @@ class User {
         $_SESSION[$this->GetLoginSessionVar()] = $username;
         
         return true;
-    }
+    }*/
         
     function CheckLoginInDB($username,$password)
     {
@@ -119,39 +119,6 @@ mysql_query("UPDATE `ipcheck` SET `failedattempts` = '$loginattempts_total' WHER
         return true;
     }
     
-    function DBLogin()
-    {
-        $this->connection = mysql_connect($this->db_host,$this->username,$this->pwd);
-
-        if(!$this->connection)
-        {   
-            $this->HandleDBError("Database Login failed! Please make sure that the DB login credentials provided are correct");
-            return false;
-        }
-        if(!mysql_select_db($this->database, $this->connection))
-        {
-            $this->HandleDBError('Failed to select database: '.$this->database.' Please make sure that the database name provided is correct');
-            return false;
-        }
-        if(!mysql_query("SET NAMES 'UTF8'",$this->connection))
-        {
-            $this->HandleDBError('Error setting utf8 encoding');
-            return false;
-        }
-        return true;
-    }    
-
-    //-------Private Helper functions-----------
-    
-    function HandleError($err)
-    {
-        $this->error_message .= $err."\r\n";
-    }
-    
-    function HandleDBError($err)
-    {
-        $this->HandleError($err."\r\n mysqlerror:".mysql_error());
-    }
 }
 
 ?>

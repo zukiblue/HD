@@ -1,7 +1,8 @@
 <?php
 include('SMTPconfig.php');
 include('SMTPClass.php');
-require('authenticate.php');
+require_once('auth.class.php');
+$auth->requireAuthentication(0);
 ?>
 This is a private website that utilizes some form of secure login for selected visitors.
 <br />

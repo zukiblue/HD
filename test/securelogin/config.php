@@ -22,19 +22,18 @@ $subject='New user registration notification';
 $from='From: www.example.com';
 
 //Define Recaptcha parameters
-$privatekey ="6LeQ7tsSAAAAAJXqNJlBTkdr06_iZY1qiw9lOWAQ";
-$publickey = "6LeQ7tsSAAAAAGwXqfjA6_G5CjqLl64LCkII0aDw";
-
+$recaptcha_privatekey ="6LeQ7tsSAAAAAJXqNJlBTkdr06_iZY1qiw9lOWAQ";
+$recaptcha_publickey = "6LeQ7tsSAAAAAGwXqfjA6_G5CjqLl64LCkII0aDw";
+$recaptcha_showafter = 2; // failed attempts
+        
 //Define length of salt,minimum=10, maximum=35
 $length_salt=15;
 
-//Define the maximum number of failed attempts to ban brute force attackers
-//minimum is 5
+//maximum number of failed attempts to ban brute force attackers
 $maxfailedattempt=5;
 
-//Define session timeout in seconds
-//minimum 60 (for one minute)
-$sessiontimeout=180;
+//session timeout in seconds
+$sessiontimeout=1800;
 
 ////////////////////////////////////
 //END OF USER CONFIGURATION/////////
@@ -46,7 +45,7 @@ $dbhandle = mysql_connect($hostname, $username, $password)
  or die("Unable to connect to MySQL");
 $selected = mysql_select_db($database,$dbhandle)
 or die("Could not select $database");
-$loginpage_url= $domain.'securelogin/';
+$loginpage_url= $domain.'securelogin/login.php';
 $forbidden_url= $domain.'securelogin/403forbidden.php';
 #die($loginpage_url);
 ?>

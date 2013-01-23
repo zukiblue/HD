@@ -29,4 +29,10 @@ function sanitizeForSQL($str)
     return $retstr;
 }
 
+function redirectToURL($url)
+{
+    header("Location: $url");
+    exit;
+}
+
 ?>
