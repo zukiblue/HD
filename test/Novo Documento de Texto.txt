@@ -1,0 +1,34 @@
+Recent advancements in PHP offer the developer a variety of tools to improve the security of login systems. The login script we will be developing consists of the following very important security features:
+ 
+1.) A Hashed password (SHA-256+ Strong Salt) stored in a MySQL database.
+2.) Anti-brute force protection using captcha challenges and denied access for more than “X” failed attempts relating to a specific IP address.
+3.) User registration by providing username and password – protected with a captcha to prevent automated sign-ups.
+4.) Protection of user-sessions against session hijacking and fixation.
+5.) “X” minute idle timeout to automatically reset/destroy cookies (session lifetime control).
+6.) No captcha for 1st 3 failed login; captcha will be provided for the remaining multiple login attempts (brute force prevention).
+7.) Authentication for user logouts to prevent request forgeries. This can be extended to other features and not just logging out (for example: deleting files).
+8.) No persistent logins - no “remember me” feature.
+10.) User input validation against MySQL injections and most common XSS attacks.
+11.) Preventing direct file access to authentication scripts.
+12.) Easy to implement system with users providing all details in one file (config.php).
+13.) For best security (recommended), you should implement the login script with HTTPS (if available). This will encrypt the sessions. The script will work in HTTPS.
+ 
+What this project does not have:
+ 
+1.) No feature for email support (such as sending an email after registration or user verification). This can, however, be easily added to the existing script.
+2.) No “forget password” feature.
+3.) No “remember me” feature.
+ 
+This project is tested to work in PHP 5 and MySQL 5 with Apache and Linux/Unix servers. It consists of five very important scripts: 
+
+1.) register.php – used during new user registration.
+2.) authenticate.php – provides user login authentication and control.
+3.) config.php – user-specific configuration parameters and MySQL database connection parameters.
+4.) 403forbidden.php – the landing page for brute force attackers and session hijackers with denied access.
+5.) recaptchalib.php -recaptcha library
+ 
+If you want to see how this project works before we get started, you can go to an actual working demo at: http://www.php-developer.org/securelogin/ to see the features at work. 
+
+For starters, let's discuss the main scripts: register.php and authenticate.php (see the comments below). Implementation procedures and the complete script can be found at the end of this article. 
+
+Read more at http://www.devshed.com/c/a/PHP/Creating-a-Secure-PHP-Login-Script-59941/#pLaL4lobrcGGuEBh.99 
