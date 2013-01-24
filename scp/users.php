@@ -1,6 +1,8 @@
 <?php
 require_once('core.php');
-require_once 'user.class.php';
+require_once 'users.class.php';
+//$users = Users::init();
+
 $user=null;
 
 if($_REQUEST['id'] && !($user=User::get($_REQUEST['id'])))
@@ -94,11 +96,7 @@ $nav->setTabActive('staff');
 require(STAFFINC_DIR.'header.inc.php');
 
 //$auth->requireAuthentication(0);
-
-/*if(!defined('OSTADMININC') || !$user|| !$user->isAdmin())
-    echo 'Access Denied'; 
-else {    */
 require($page);
-//}
+
 include(STAFFINC_DIR.'footer.inc.php');
 ?>

@@ -1,59 +1,6 @@
 <?php
 // Protect from direct request
 if(basename($_SERVER['SCRIPT_NAME'])==basename(__FILE__)) die('Access denied @'.basename(__FILE__));
-// Protect from non admin users
-//if(!defined('OSTADMININC') || !$user || !$user->isAdmin()) die('Access denied @ '.basename(__FILE__));
-$qstr='';
-$select='SELECT users.* ';
-$from='FROM '.TBL_USERS.' users ';
-$where='WHERE 1 ';
-/*
-if($_REQUEST['did'] && is_numeric($_REQUEST['did'])) {
-    $where.=' AND staff.dept_id='.db_input($_REQUEST['did']);
-    $qstr.='&did='.urlencode($_REQUEST['did']);
-}
-
-if($_REQUEST['gid'] && is_numeric($_REQUEST['gid'])) {
-    $where.=' AND staff.group_id='.db_input($_REQUEST['gid']);
-    $qstr.='&gid='.urlencode($_REQUEST['gid']);
-}
-
-if($_REQUEST['tid'] && is_numeric($_REQUEST['tid'])) {
-    $where.=' AND m.team_id='.db_input($_REQUEST['tid']);
-    $qstr.='&tid='.urlencode($_REQUEST['tid']);
-}
-*/
-//$sortOptions=array('name'=>'staff.firstname,staff.lastname','username'=>'staff.username','status'=>'isactive',
-//                   'group'=>'grp.group_name','dept'=>'dept.dept_name','created'=>'staff.created','login'=>'staff.lastlogin');
-$sortOptions=array('name'=>'users.name','username'=>'users.username','status'=>'users.active','created'=>'users.creationdate','login'=>'users.lastlogin');
-$orderWays=array('DESC'=>'DESC','ASC'=>'ASC');
-$sort=($_REQUEST['sort'] && $sortOptions[strtolower($_REQUEST['sort'])])?strtolower($_REQUEST['sort']):'name';
-//Sorting options...
-if($sort && $sortOptions[$sort]) {
-    $order_column =$sortOptions[$sort];
-}
-$order_column=$order_column?$order_column:'staff.firstname,staff.lastname';
-
-if($_REQUEST['order'] && $orderWays[strtoupper($_REQUEST['order'])]) {
-    $order=$orderWays[strtoupper($_REQUEST['order'])];
-}
-
-$order=$order?$order:'ASC';
-if($order_column && strpos($order_column,',')){
-    $order_column=str_replace(','," $order,",$order_column);
-}
-$x=$sort.'_sort';
-$$x=' class="'.strtolower($order).'" ';
-$order_by="$order_column $order ";
-
-$total=db_count('SELECT count(DISTINCT users.id) '.$from.' '.$where);
-$page=($_GET['p'] && is_numeric($_GET['p']))?$_GET['p']:1;
-$pageNav=new Pagenate($total,$page,PAGE_LIMIT);
-$pageNav->setURL('users.php',$qstr.'&sort='.urlencode($_REQUEST['sort']).'&order='.urlencode($_REQUEST['order']));
-//Ok..lets roll...create the actual query
-$qstr.='&order='.($order=='DESC'?'ASC':'DESC');
-$query="$select $from $where GROUP BY users.id ORDER BY $order_by LIMIT ".$pageNav->getStart().",".$pageNav->getLimit();
-//echo $query;
 ?>
 <h2><?php lang('users_title'); ?></h2>
 <div style="width:700; float:left;">
@@ -67,9 +14,9 @@ $query="$select $from $where GROUP BY users.id ORDER BY $order_by LIMIT ".$pageN
                   'INNER JOIN '.STAFF_TABLE.' staff ON(staff.dept_id=dept.dept_id) '.
                   'GROUP By dept.dept_id HAVING users>0 ORDER BY dept_name';
              if(($res=db_query($sql)) && db_num_rows($res)){
-                 while(list($id,$name, $users)=db_fetch_row($res)){
+                 while(list($id,$name, $userss)=db_fetch_row($res)){
                      $sel=($_REQUEST['did'] && $_REQUEST['did']==$id)?'selected="selected"':'';
-                     echo sprintf('<option value="%d" %s>%s (%s)</option>',$id,$sel,$name,$users);
+                     echo sprintf('<option value="%d" %s>%s (%s)</option>',$id,$sel,$name,$userss);
                  }
              }
              ?>
@@ -82,9 +29,9 @@ $query="$select $from $where GROUP BY users.id ORDER BY $order_by LIMIT ".$pageN
                   'INNER JOIN '.STAFF_TABLE.' staff ON(staff.group_id=grp.group_id) '.
                   'GROUP BY grp.group_id ORDER BY group_name';
              if(($res=db_query($sql)) && db_num_rows($res)){
-                 while(list($id,$name,$users)=db_fetch_row($res)){
+                 while(list($id,$name,$userss)=db_fetch_row($res)){
                      $sel=($_REQUEST['gid'] && $_REQUEST['gid']==$id)?'selected="selected"':'';
-                     echo sprintf('<option value="%d" %s>%s (%s)</option>',$id,$sel,$name,$users);
+                     echo sprintf('<option value="%d" %s>%s (%s)</option>',$id,$sel,$name,$userss);
                  }
              }
              ?>
@@ -96,9 +43,9 @@ $query="$select $from $where GROUP BY users.id ORDER BY $order_by LIMIT ".$pageN
                   'INNER JOIN '.TEAM_MEMBER_TABLE.' member ON(member.team_id=team.team_id) '.
                   'GROUP BY team.team_id ORDER BY team.name';
              if(($res=db_query($sql)) && db_num_rows($res)){
-                 while(list($id,$name,$users)=db_fetch_row($res)){
+                 while(list($id,$name,$userss)=db_fetch_row($res)){
                      $sel=($_REQUEST['tid'] && $_REQUEST['tid']==$id)?'selected="selected"':'';
-                     echo sprintf('<option value="%d" %s>%s (%s)</option>',$id,$sel,$name,$users);
+                     echo sprintf('<option value="%d" %s>%s (%s)</option>',$id,$sel,$name,$userss);
                  }
              }
              ?>
@@ -110,11 +57,26 @@ $query="$select $from $where GROUP BY users.id ORDER BY $order_by LIMIT ".$pageN
 <div style="float:right;text-align:right;padding-right:5px;"><b><a href="users.php?a=add" class="Icon newstaff">Add New Staff</a></b></div>
 <div class="clear"></div>
 <?php
-$res=db_query($query);
+
+$qstr='';
+$users=Users::init();
+$res = $users->load($_REQUEST['sort'], $_REQUEST['order']);
+// CSS & Qry string
+$qstr.='&order='.$users->getReverseOrder();
+$x=$users->sort.'_sort';
+$$x=' class="'.strtolower($users->order).'" ';
+
+// PAGING
+/*
+$total=$users->recordCount();
+$page=($_GET['p'] && is_numeric($_GET['p']))?$_GET['p']:1;
+$pageNav=new Pagenate($total,$page,PAGE_LIMIT);
+$pageNav->setURL('users.php',$qstr.'&sort='.urlencode($_REQUEST['sort']).'&order='.urlencode($_REQUEST['order']));
 if($res && ($num=db_num_rows($res)))        
     $showing=$pageNav->showing();
 else
     $showing='No user found!';
+*/
 ?>
 <form action="users.php" method="POST" name="users" >
  <?php csrf_token(); ?>
@@ -156,7 +118,8 @@ else
                </tr>
             <?php
             } //end of while.
-        endif; ?>
+        endif; 
+        ?>
     <tfoot>
      <tr>
         <td colspan="8">
@@ -185,6 +148,7 @@ if($res && $num): //Show options..
 </p>
 <?php
 endif;
+  mysql_free_result($res);
 ?>
 </form>
 
