@@ -95,10 +95,11 @@ $nav->setTabActive('staff');
 
 require(STAFFINC_DIR.'header.inc.php');
 
-if(!defined('OSTADMININC') || !$user|| !$user->isAdmin())
+$auth->requireAuthentication(0);
+/*/if(!defined('OSTADMININC') || !$user|| !$user->isAdmin())
     echo 'Access Denied'; 
-else {    
+else { */   
     require($page);
-}
+//}
 include(STAFFINC_DIR.'footer.inc.php');
 ?>

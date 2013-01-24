@@ -128,7 +128,7 @@ function getlang( $key, $language = null ) {
 }
 
 function lang( $key, $language = null ) {
-    echo getlang( $key, $language);
+    return getlang( $key, $language);
 }
 /*
 

@@ -1,6 +1,5 @@
 <?php  
 if(basename($_SERVER['SCRIPT_NAME'])==basename(__FILE__)) die('Access denied..');
-
 // Stats - for page request time
 $g_request_time = microtime(true);
 
@@ -18,7 +17,6 @@ if ( file_exists( $rootpath.'config'.$d.'config.inc.php' ) ) {
 } else {
     $config_inc_found = false;
 }    
-
 // Load constants
 require_once( $rootpath.'config'.$d.'constants.inc.php' );
 
@@ -98,6 +96,7 @@ unset( $d, $rootpath, $class_path, $include_path, $include_path2, $include_pear,
     require('class.osticket.php');
     require('class.ostsession.php');
     #require(INCLUDE_DIR.'class.usersession.php');
+    
     require(INCLUDE_DIR.'class.pagenate.php'); //Pagenate helper!
     require(INCLUDE_DIR.'class.log.php');
     require(INCLUDE_DIR.'class.mcrypt.php');
@@ -134,6 +133,7 @@ unset( $d, $rootpath, $class_path, $include_path, $include_path2, $include_pear,
         die("<b>Fatal Error:</b> Contact system administrator. ". $msg);
         exit;
     }
+   require('auth.class.php');
     
     //Init
     $session = $ost->getSession();
@@ -164,8 +164,8 @@ define('OSTSTAFFINC',TRUE);
 // define('KB_PREMADE_TABLE',TABLE_PREFIX.'kb_premade');
 
 /* include what is needed on staff control panel */
-require_once('user.class.php');
-require_once('group.class.php');
+//require_once('user.class.php');
+//require_once('group.class.php');
 require_once(INCLUDE_DIR.'class.nav.php');
 require_once(INCLUDE_DIR.'class.csrf.php');
 
@@ -174,7 +174,7 @@ require_once(INCLUDE_DIR.'class.csrf.php');
     * ONLY super admins can access the helpdesk on offline state.
 */
 
-
+/*
 if(!function_exists('LoginPage')) { //Ajax interface can pre-declare the function to  trap expired sessions.
     function LoginPage($msg) {
         $_SESSION['_staff']['auth']['dest']=THISURI;
@@ -182,28 +182,30 @@ if(!function_exists('LoginPage')) { //Ajax interface can pre-declare the functio
         require(SCP_DIR.'login.php');
         exit;
     }
-}
-echo session_id().'....<Br />';
-echo print_r($user).'....<Br /><Br />';
+}*/
+//echo session_id().'....<Br />';
+#echo print_r($user).'....<Br /><Br />';
 
-$user = new User($_SESSION['_staff']['userID']); //Set staff object.
+#$user = new User($_SESSION['_staff']['userID']); //Set staff object.
 #$dologin=0;
 #if(!$user || !is_object($user) || !$user->getId() || !$user->isValid()){
 
 //1) is the user Logged in for real && is staff.
 //if (user-)
 //echo 'User:<Br />';
-echo print_r($user).'....<Br />';
+//echo print_r($user).'....<Br />';
 //echo 'getId: '.$user->getId().'....<Br />';
 //echo 'isValid: '.print_r($user->isValid()).'....<Br />';;
 //echo 'SESSION: '.$_SESSION['_staff']['userID'];
-die ('io');
-if(!$user || !is_object($user) || !$user->getId() || !$user->isValid()){
+//die ('io');
+/*
+ if(!$user || !is_object($user) || !$user->getId() || !$user->isValid()){
+ 
     $msg=(!$user || !$user->isValid())?'Authentication Required':'Session timed out due to inactivity';
     LoginPage($msg);
     exit;
 }
-//die("aaaa");
+*/
 
 //2) if not super admin..check system status and group status
 /*if(!$user->isAdmin()) {
@@ -222,24 +224,24 @@ if(!$user || !is_object($user) || !$user->getId() || !$user->isValid()){
  * */
 
 //Keep the session activity alive
-$user->refreshSession();
+#$user->refreshSession();
 
 /******* CSRF Protectin *************/
 // Enforce CSRF protection for POSTS
-if ($_POST  && !$ost->checkCSRFToken()) {
+/*if ($_POST  && !$ost->checkCSRFToken()) {
     Http::response(400, 'Valid CSRF Token Required');
     exit;
 }
 
 //Add token to the header - used on ajax calls [DO NOT CHANGE THE NAME] 
 $ost->addExtraHeader('<meta name="csrf_token" content="'.$ost->getCSRFToken().'" />');
-
+*/
 /******* SET STAFF DEFAULTS **********/
 //Set staff's timezone offset.
-$_SESSION['TZ_OFFSET']=$user->getTZoffset();
-$_SESSION['TZ_DST']=$user->observeDaylight();
+//$_SESSION['TZ_OFFSET']=$user->getTZoffset();
+//$_SESSION['TZ_DST']=$user->observeDaylight();
 
-define('PAGE_LIMIT', $user->getPageLimit()?$user->getPageLimit():DEFAULT_PAGE_LIMIT);
+//define('PAGE_LIMIT', $user->getPageLimit()?$user->getPageLimit():DEFAULT_PAGE_LIMIT);
 
 //Clear some vars. we use in all pages.
 $errors=array();
@@ -259,13 +261,15 @@ if($ost->isUpgradePending() && !$exempt) {
 
 $nav = new StaffNav($user);
 //Check for forced password change.
-if($user->forcePasswdChange() && !$exempt) {
+/*if($user->forcePasswdChange() && !$exempt) {
     # XXX: Call staffLoginPage() for AJAX and API requests _not_ to honor
     #      the request
     $sysnotice = 'Password change required to continue';
     require('profile.php'); //profile.php must request this file as require_once to avoid problems.
     exit;
-}
+}*/
 $ost->setWarning($sysnotice);
 $ost->setPageTitle('osTicket :: Staff Control Panel');
+
+
 ?>

@@ -15,4 +15,25 @@ $main_title2 = 'Move2';
 $main_title3 = 'Move3';
 
 $users_title = 'Users';
+$users_msg_invalid  = 'Unknown or invalid user.';
+$users_msg_updok    = 'User updated successfully';
+$users_msg_upderror = 'Unable to update user. Correct any error(s) below and try again!';
+$users_msg_addok    = 'added successfully';
+$users_msg_adderror = 'Unable to add user. Correct any error(s) below and try again.';
+$users_msg_badaction= 'Unknown action/command';
+// User
+$user_title        = 'User Account';
+$user_subtitle1    = 'User Information';
+$user_subtitle2    = 'Account Password';
+$user_add_title    = 'Add New User';
+$user_add_submit   = 'Add User';
+$user_add_passtext = 'To reset the password enter a new one below';
+$user_upd_title    = 'Update User';
+$user_upd_submit   = 'Save Changes';
+$user_upd_passtext = 'Temp. password required';
+$user_form_username= 'Username';
+$user_form_realname= 'Real Name';
+$user_form_email   = 'Email';
+$user_form_level   = 'Access Level';
+$user_form_status  = 'Account Status';
 ?>

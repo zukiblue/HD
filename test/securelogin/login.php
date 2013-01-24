@@ -31,13 +31,13 @@ Hi! This private website is restricted to public access. Please enter username a
 <!-- START OF LOGIN FORM -->
 <form action="<?php echo htmlentities($_SERVER['PHP_SELF']); ?>" method="POST">
 
-Username:  <input type="text" class="<?php if ($validationresults==FALSE) echo "invalid"; ?>" id="user" name="user">
-Password: <input name="pass" type="password" class="<?php if ($validationresults==FALSE) echo "invalid"; ?>" id="pass" >
+Username:  <input type="text" class="<?php if ($auth->validationresults==FALSE) echo "invalid"; ?>" id="user" name="user">
+Password: <input name="pass" type="password" class="<?php if ($auth->validationresults==FALSE) echo "invalid"; ?>" id="pass" >
 <br /><br />
 <?php 
 //echo 'auth-loginattempts_username:'.$auth->loginattempts_username;
 //echo '  auth-loginattempts_total:'.$auth->loginattempts_ip;
-global $recaptcha_showafter;
+    global $recaptcha_showafter;
 global $recaptcha_publickey;
 if (($auth->loginattempts_username > 2) || ($auth->loginattempts_ip > $recaptcha_showafter ) || ($auth->loginattempts_ip>2)) { ?>
 Type the captcha below:
@@ -49,7 +49,7 @@ echo recaptcha_get_html($recaptcha_publickey);
 <br />
 <?php } 
 
-echo '  $auth->validationresults:'.$auth->validationresults;
+//echo '  $auth->validationresults:'.$auth->validationresults;
 ?>
 <?php if ($auth->validationresults==FALSE) echo '<font color="red">Please enter valid username, password or captcha (if required).</font>'; ?><br />
 <input type="submit" value="Login">                   

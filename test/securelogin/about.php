@@ -2,7 +2,7 @@
 include('SMTPconfig.php');
 include('SMTPClass.php');
 require_once('auth.class.php');
-$auth->requireAuthentication(0);
+//$auth->requireAuthentication(0);
 ?>
 This is a private website that utilizes some form of secure login for selected visitors.
 <br />
@@ -12,7 +12,7 @@ Navigation Menu<br />
 ===============<br />
 <a href="index.php">Homepage</a><br />
 <a href="about.php">About this page</a><br />
-<?php if (isset($_SESSION['logged_in'])) { ?>
+<?php if (isset($_SESSION['loggedin'])) { ?>
 <a href="logout.php?signature=<?php echo $_SESSION['signature']; ?>">Logout</a><br /><?php } 
 
 

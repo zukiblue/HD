@@ -1,17 +1,12 @@
 <?php
 session_start();
-require('config.php');
-function sanitize($data){
-$data=trim($data);
-$data=htmlspecialchars($data);
-return $data;
-}
+require('config.inc.php');
+require_once('auth.class.php');
+
 $signature= sanitize($_GET['signature']);
 if ($signature === $_SESSION['signature']) {
 //authenticated user request
-$_SESSION['logged_in'] = False;
-session_destroy();   
-session_unset();     
+    $auth->logout();
 echo 'You have successfully logout from the private website! Thank you.<br /><br />';
 ?>
 ===============<br />
@@ -21,8 +16,7 @@ Navigation Menu<br />
 <a href="about.php">About this page</a><br />
 <?php
 } else {
-//unauthorized logout
-header(sprintf("Location: %s", $forbidden_url));	
-exit;  
+    $auth->block();
+    exit;  
 }
 ?>

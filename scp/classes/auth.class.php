@@ -1,5 +1,4 @@
 <?php
-require_once('config.inc.php');
 require_once("utils.inc.php");
 
 if(!isset($_SESSION))
@@ -11,8 +10,7 @@ if (!isset($_SESSION['loggedin'])) {
 $auth = new Auth ();
 $auth-> checkBasicAuthentication();
 
-$loginpage_url = $loginpage_url . '?rq='.basename($_SERVER['REQUEST_URI']);
-//echo $loginpage_url;
+$_SESSION['logindestination']=$_SERVER['REQUEST_URI'];
 
 class Auth {
     var $loginattempts_username;
@@ -24,6 +22,10 @@ class Auth {
     var $signature;    
 
     //var $maxfailedattempt;
+    
+    function getUserName() {
+      return 'UserName';    
+    }
     
     function Auth() {
         $this->loginattempts_username = 0;

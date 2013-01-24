@@ -47,6 +47,7 @@
     define('API_KEY_TABLE',TABLE_PREFIX.'api_key');
     define('TIMEZONE_TABLE',TABLE_PREFIX.'timezone'); 
 
+    define('TBL_USERS','users');
     // Run After config.inc.php
     // This is to support old installations. with no secret salt.
     if(!defined('SECRET_SALT')) define('SECRET_SALT',md5(TABLE_PREFIX.ADMIN_EMAIL));

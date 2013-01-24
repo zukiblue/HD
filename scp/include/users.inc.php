@@ -2,15 +2,12 @@
 // Protect from direct request
 if(basename($_SERVER['SCRIPT_NAME'])==basename(__FILE__)) die('Access denied @'.basename(__FILE__));
 // Protect from non admin users
-if(!defined('OSTADMININC') || !$user || !$user->isAdmin()) die('Access denied @ '.basename(__FILE__));
+//if(!defined('OSTADMININC') || !$user || !$user->isAdmin()) die('Access denied @ '.basename(__FILE__));
 $qstr='';
-$select='SELECT staff.*,CONCAT_WS(" ",firstname,lastname) as name, grp.group_name, dept.dept_name as dept,count(m.team_id) as teams ';
-$from='FROM '.STAFF_TABLE.' staff '.
-      'LEFT JOIN '.GROUP_TABLE.' grp ON(staff.group_id=grp.group_id) '.
-      'LEFT JOIN '.DEPT_TABLE.' dept ON(staff.dept_id=dept.dept_id) '.
-      'LEFT JOIN '.TEAM_MEMBER_TABLE.' m ON(m.staff_id=staff.staff_id) ';
+$select='SELECT users.* ';
+$from='FROM '.TBL_USERS.' users ';
 $where='WHERE 1 ';
-
+/*
 if($_REQUEST['did'] && is_numeric($_REQUEST['did'])) {
     $where.=' AND staff.dept_id='.db_input($_REQUEST['did']);
     $qstr.='&did='.urlencode($_REQUEST['did']);
@@ -25,9 +22,10 @@ if($_REQUEST['tid'] && is_numeric($_REQUEST['tid'])) {
     $where.=' AND m.team_id='.db_input($_REQUEST['tid']);
     $qstr.='&tid='.urlencode($_REQUEST['tid']);
 }
-
-$sortOptions=array('name'=>'staff.firstname,staff.lastname','username'=>'staff.username','status'=>'isactive',
-                   'group'=>'grp.group_name','dept'=>'dept.dept_name','created'=>'staff.created','login'=>'staff.lastlogin');
+*/
+//$sortOptions=array('name'=>'staff.firstname,staff.lastname','username'=>'staff.username','status'=>'isactive',
+//                   'group'=>'grp.group_name','dept'=>'dept.dept_name','created'=>'staff.created','login'=>'staff.lastlogin');
+$sortOptions=array('name'=>'users.name','username'=>'users.username','status'=>'users.active','created'=>'users.creationdate','login'=>'users.lastlogin');
 $orderWays=array('DESC'=>'DESC','ASC'=>'ASC');
 $sort=($_REQUEST['sort'] && $sortOptions[strtolower($_REQUEST['sort'])])?strtolower($_REQUEST['sort']):'name';
 //Sorting options...
@@ -48,13 +46,13 @@ $x=$sort.'_sort';
 $$x=' class="'.strtolower($order).'" ';
 $order_by="$order_column $order ";
 
-$total=db_count('SELECT count(DISTINCT staff.staff_id) '.$from.' '.$where);
+$total=db_count('SELECT count(DISTINCT users.id) '.$from.' '.$where);
 $page=($_GET['p'] && is_numeric($_GET['p']))?$_GET['p']:1;
 $pageNav=new Pagenate($total,$page,PAGE_LIMIT);
 $pageNav->setURL('users.php',$qstr.'&sort='.urlencode($_REQUEST['sort']).'&order='.urlencode($_REQUEST['order']));
 //Ok..lets roll...create the actual query
 $qstr.='&order='.($order=='DESC'?'ASC':'DESC');
-$query="$select $from $where GROUP BY staff.staff_id ORDER BY $order_by LIMIT ".$pageNav->getStart().",".$pageNav->getLimit();
+$query="$select $from $where GROUP BY users.id ORDER BY $order_by LIMIT ".$pageNav->getStart().",".$pageNav->getLimit();
 //echo $query;
 ?>
 <h2><?php lang('users_title'); ?></h2>
@@ -118,7 +116,7 @@ if($res && ($num=db_num_rows($res)))
 else
     $showing='No user found!';
 ?>
-<form action="users.php" method="POST" name="staff" >
+<form action="users.php" method="POST" name="users" >
  <?php csrf_token(); ?>
  <input type="hidden" name="do" value="mass_process" >
  <input type="hidden" id="action" name="a" value="" >
@@ -142,18 +140,18 @@ else
             $ids=($errors && is_array($_POST['ids']))?$_POST['ids']:null;
             while ($row = db_fetch_array($res)) {
                 $sel=false;
-                if($ids && in_array($row['staff_id'],$ids))
+                if($ids && in_array($row['id'],$ids))
                     $sel=true;
                 ?>
-               <tr id="<?php echo $row['staff_id']; ?>">
+               <tr id="<?php echo $row['id']; ?>">
                 <td width=7px>
-                  <input type="checkbox" class="ckb" name="ids[]" value="<?php echo $row['staff_id']; ?>" <?php echo $sel?'checked="checked"':''; ?> >
-                <td><a href="users.php?id=<?php echo $row['staff_id']; ?>"><?php echo Format::htmlchars($row['name']); ?></a>&nbsp;</td>
+                  <input type="checkbox" class="ckb" name="ids[]" value="<?php echo $row['id']; ?>" <?php echo $sel?'checked="checked"':''; ?> >
+                <td><a href="users.php?id=<?php echo $row['id']; ?>"><?php echo Format::htmlchars($row['name']); ?></a>&nbsp;</td>
                 <td><?php echo $row['username']; ?></td>
-                <td><?php echo $row['isactive']?'Active':'<b>Locked</b>'; ?>&nbsp;<?php echo $row['onvacation']?'<small>(<i>vacation</i>)</small>':''; ?></td>
-                <td><a href="groups.php?id=<?php echo $row['group_id']; ?>"><?php echo Format::htmlchars($row['group_name']); ?></a></td>
-                <td><a href="departments.php?id=<?php echo $row['dept_id']; ?>"><?php echo Format::htmlchars($row['dept']); ?></a></td>
-                <td><?php echo Format::db_date($row['created']); ?></td>
+                <td><?php echo $row['active']?'Active':'<b>Inactive</b>'; ?>&nbsp;<?php echo $row['onvacation']?'<small>(<i>vacation</i>)</small>':''; ?></td>
+                <td></td>
+                <td></td>
+                <td><?php echo Format::db_date($row['creationdate']); ?></td>
                 <td><?php echo Format::db_datetime($row['lastlogin']); ?>&nbsp;</td>
                </tr>
             <?php
