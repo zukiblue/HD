@@ -105,8 +105,9 @@ function getlang( $key, $language = null ) {
 	lang_ensure_loaded( $_lang );
 
         if( lang_exists( $key, $_lang ) ) {
-		return $languagestrings[$_lang][$key];
+            return $languagestrings[$_lang][$key];
 	} else {
+            return $key;
 /*		$t_plugin_current = plugin_get_current();
 		if( !is_null( $t_plugin_current ) ) {
 			lang_load( $t_lang, config_get( 'plugin_path' ) . $t_plugin_current . DIRECTORY_SEPARATOR . 'lang' . DIRECTORY_SEPARATOR );
@@ -118,7 +119,7 @@ function getlang( $key, $language = null ) {
 		if( $_lang == 'english' ) {
 			//error_parameters( $p_string );
 			//trigger_error( ERROR_LANG_STRING_NOT_FOUND, WARNING );
-			return '';
+			return $key;
 		} else {
 
 			# if string is not found in a language other than english, then retry using the english language.
@@ -128,7 +129,7 @@ function getlang( $key, $language = null ) {
 }
 
 function lang( $key, $language = null ) {
-    return getlang( $key, $language);
+  return getlang( $key, $language);
 }
 /*
 

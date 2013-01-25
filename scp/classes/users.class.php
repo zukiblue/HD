@@ -4,10 +4,6 @@ class Users {
     var $records;
     var $sort;
     var $order;
-    //var $id;
-    //var $currentSql;
-    //var $currentSqlPaged;
-    //var $recordcount;    
         
     static function init() {
         return ( ($users=new Users())?$users:null );
@@ -20,10 +16,7 @@ class Users {
     }   
 
     function load($sortCol, $sortOrd) {
-        //$query="$select $from $where 
-        //    GROUP BY users.id 
         // ORDER BY $order_by LIMIT ".$pageNav->getStart().",".$pageNav->getLimit();
-        //if(!$var && !($var=$this->id))  return false;
 
         $sortOptions=array(
             'name'=>'users.name',
@@ -66,10 +59,7 @@ class Users {
 
         if(!($this->records=db_query($sql)) || !db_num_rows($this->records))
             return NULL;
-        
-        //$this->record=db_fetch_array($res);
-        //$this->id  = $this->record['id'];
-       
+
         return ($this->records);// ($this->id);
     }
 
@@ -81,8 +71,6 @@ class Users {
         $from='FROM '.TBL_USERS.' users ';
         $where='WHERE 1 ';
         return db_count('SELECT count(users.id) '.$from.' '.$where);
-        //if (!isset($this->recordcount)) 
-            //$this->recordcount = db_count('SELECT count(DISTINCT id) '.$from.' '.$where);   
     }
 
     function getReverseOrder() {
@@ -114,7 +102,7 @@ class Users {
 
         //$this->updateTeams($vars['teams']);
         //$this->reload();
-        
+                
         return true;
     }
 
@@ -139,9 +127,9 @@ class Users {
             .' ,name='.db_input($vars['name'])
             .' ,email='.db_input($vars['email']);
 
-        $sql.=' WHERE id='.db_input($vars['id']);
+        $sql.=' WHERE id='.db_input($id);
 
-        //echo $sql;
+        echo $sql;
 
         return (db_query($sql));
     }
