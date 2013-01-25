@@ -1,17 +1,15 @@
 <?php
 // Protect from direct request
 if(basename($_SERVER['SCRIPT_NAME'])==basename(__FILE__)) die('Access denied @'.basename(__FILE__));
-//if(!defined('OSTADMININC') || !$thisstaff || !$thisstaff->isAdmin()) die('Access Denied');
 
 $info=array();
 $qstr='';
 if($user && $_REQUEST['a']!='add'){
-    //Editing Department.
     $title=lang(user_upd_title);
     $action='update';
     $submit_text=lang(user_upd_submit);
     $passwd_text=lang(user_upd_passtext);
-    $info=$user->getRecord();
+    $info=$user;
     //$info['id']=$user->id;
     //$info['teams'] = $user->getTeams();
     $qstr.='&id='.$info['id'];
@@ -20,7 +18,7 @@ if($user && $_REQUEST['a']!='add'){
     $action='create';
     $submit_text=lang(user_add_submit);
     $passwd_text=lang(user_add_passtext).'&nbsp;<span class="error">&nbsp;*</span>';
-    //Some defaults for new staff.
+    //defaults for new user
     $info['change_passwd']=1;
     $info['isactive']=1;
     $info['isvisible']=1;
@@ -28,6 +26,7 @@ if($user && $_REQUEST['a']!='add'){
     $qstr.='&a=add';
 }
 $info=Format::htmlchars(($errors && $_POST)?$_POST:$info);
+
 ?>
 
 <form action="users.php?<?php echo $qstr; ?>" method="post" id="save" autocomplete="off">

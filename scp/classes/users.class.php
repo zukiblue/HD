@@ -19,17 +19,6 @@ class Users {
         return;
     }   
 
-    function recordCount() {
-        $from='FROM '.TBL_USERS.' users ';
-        $where='WHERE 1 ';
-        return db_count('SELECT count(users.id) '.$from.' '.$where);
-        //if (!isset($this->recordcount)) 
-            //$this->recordcount = db_count('SELECT count(DISTINCT id) '.$from.' '.$where);   
-    }
-
-    function getReverseOrder() {
-        return ($this->order=='DESC'?'ASC':'DESC');
-    }
     function load($sortCol, $sortOrd) {
         //$query="$select $from $where 
         //    GROUP BY users.id 
@@ -84,9 +73,31 @@ class Users {
         return ($this->records);// ($this->id);
     }
 
-    function getRecord() {
-        return $this->record;
+    function getRecords() {
+        return $this->records;
     }
+
+    function recordCount() {
+        $from='FROM '.TBL_USERS.' users ';
+        $where='WHERE 1 ';
+        return db_count('SELECT count(users.id) '.$from.' '.$where);
+        //if (!isset($this->recordcount)) 
+            //$this->recordcount = db_count('SELECT count(DISTINCT id) '.$from.' '.$where);   
+    }
+
+    function getReverseOrder() {
+        return ($this->order=='DESC'?'ASC':'DESC');
+    }
+    
+    function get($id) {
+        $sql='SELECT * FROM '.TBL_USERS.' WHERE id='.$id;
+
+        if(!($this->records=db_query($sql)) || !db_num_rows($this->records))
+            return NULL;
+        $this->record = mysql_fetch_array($this->records);
+        return ($this->record);
+    }
+
     
     // Add User 
     function add($vars, &$errors) {
@@ -98,11 +109,11 @@ class Users {
 
     // Update User 
     function update($vars, &$errors) {
-        if(!$this->save($this->getId(), $vars, $errors))
+        if(!$this->save($vars['id'], $vars, $errors))
             return false;
 
-        $this->updateTeams($vars['teams']);
-        $this->reload();
+        //$this->updateTeams($vars['teams']);
+        //$this->reload();
         
         return true;
     }
@@ -111,8 +122,8 @@ class Users {
         $vars['name']=Format::striptags($vars['name']);
         $vars['signature']=Format::striptags($vars['signature']);
 
-        if($this->id!=$vars['id'])
-            $errors['err']='Internal Error';
+        //if($this->id!=$vars['id'])
+        //    $errors['err']='Internal Error';
 
         if(!$vars['name'])      
             $errors['name']='Real name required';
@@ -124,12 +135,11 @@ class Users {
         //elseif(($uid=Staff::getIdByEmail($vars['email'])) && $uid!=$this->getId())
         //    $errors['email']='Email already in-use by another staff member';
         if($errors) return false;
-
         $sql='UPDATE '.TBL_USERS.' SET changedate=NOW() '
             .' ,name='.db_input($vars['name'])
             .' ,email='.db_input($vars['email']);
 
-        $sql.=' WHERE id='.db_input($this->id);
+        $sql.=' WHERE id='.db_input($vars['id']);
 
         //echo $sql;
 

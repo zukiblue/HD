@@ -106,8 +106,9 @@ else
                     $sel=true;
                 ?>
                <tr id="<?php echo $row['id']; ?>">
-                <td width=7px>
-                  <input type="checkbox" class="ckb" name="ids[]" value="<?php echo $row['id']; ?>" <?php echo $sel?'checked="checked"':''; ?> >
+                <td width=7px>  
+                    <input type="checkbox" class="ckb" name="ids[]" value="<?php echo $row['id']; ?>" <?php echo $sel?'checked="checked"':''; ?> >
+       
                 <td><a href="users.php?id=<?php echo $row['id']; ?>"><?php echo Format::htmlchars($row['name']); ?></a>&nbsp;</td>
                 <td><?php echo $row['username']; ?></td>
                 <td><?php echo $row['active']?'Active':'<b>Inactive</b>'; ?>&nbsp;<?php echo $row['onvacation']?'<small>(<i>vacation</i>)</small>':''; ?></td>
