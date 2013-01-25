@@ -2,24 +2,25 @@
 require_once('core.php');
 require_once('users.class.php');
 $users = Users::init();
-//echo var_dump($_REQUEST); 
 
 $user = null;
 if ( isset($_GET['id']) )
     $mode = 'edit';
-elseif ( isset($_GET['a']) && strcasecmp($_GET['a'], 'add') )
+elseif ( isset($_GET['a']) && strcasecmp($_GET['a'], 'add')===0 )
     $mode = 'add';
 else
     $mode = 'browse';
 
 if ( $mode==='edit' ) {
     if ( !($user = $users->get($_GET['id'])) ) {
-        $editmode = FALSE;
+        $mode = 'browse';
         $errors['err'] = 'Unknown or invalid ID.';
     }
-} elseif ( $mode==='add' ) {
     
-} elseif ($_POST){ //save
+} elseif ( $mode==='add' ) {
+    // Do Nothing
+    
+} elseif ($_POST){ //save  && !$errors
     switch(strtolower($_POST['a'])){
         case 'upd':
             if(!$users){
@@ -29,14 +30,21 @@ if ( $mode==='edit' ) {
             }elseif(!$errors['err']){
                 $errors['err']=lang(users_msg_upderror);
             }            
+            if($errors['err']) {            
+                $mode = 'edit';
+                if ( !($user = $users->get($_POST['id'])) ) {
+                    $errors['err'] = 'Unknown or invalid ID.';
+                }
+            }
             break;
         case 'add':
-            if(($id=User::create($_POST,$errors))){
+            if(($id=$users->add($_POST,$errors))){
                 $msg=Format::htmlchars($_POST['name']).lang(users_msg_addok);
- //               $_REQUEST['a']=null;
             }elseif(!$errors['err']){
                 $errors['err']=lang('users_msg_adderror');
             }
+            if($errors['err']) {
+                $mode = 'edit';            }
             break;
         default:
             $errors['err']=lang('users_msg_badaction');
@@ -44,17 +52,17 @@ if ( $mode==='edit' ) {
     }
 }
 
-if ($mode==='edit') // || $user || ($_REQUEST['a'] && !strcasecmp($_REQUEST['a'],'add')))
+if ($mode==='edit' || $mode==='add') // || $user || ($_REQUEST['a'] && !strcasecmp($_REQUEST['a'],'add')))
     $page='user.inc.php';
 else
     $page='users.inc.php';
 
 $nav->setTabActive('staff');
 
-require(STAFFINC_DIR.'header.inc.php');
+require('header.inc.php');
 
 //$auth->requireAuthentication(0);
 require($page);
 
-include(STAFFINC_DIR.'footer.inc.php');
+include('footer.inc.php');
 ?>
