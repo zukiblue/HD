@@ -48,6 +48,8 @@
     define('TIMEZONE_TABLE',TABLE_PREFIX.'timezone'); 
 
     define('TBL_USERS','users');
+    define('TBL_TICKETS',TABLE_PREFIX.'ticket');
+    
     // Run After config.inc.php
     // This is to support old installations. with no secret salt.
     if(!defined('SECRET_SALT')) define('SECRET_SALT',md5(TABLE_PREFIX.ADMIN_EMAIL));

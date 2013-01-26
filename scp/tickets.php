@@ -1,24 +1,13 @@
 <?php
-/*************************************************************************
-    tickets.php
-    
-    Handles all tickets related actions.
- 
-    Peter Rotich <peter@osticket.com>
-    Copyright (c)  2006-2012 osTicket
-    http://www.osticket.com
-
-    Released under the GNU General Public License WITHOUT ANY WARRANTY.
-    See LICENSE.TXT for details.
-
-    vim: expandtab sw=4 ts=4 sts=4:
-**********************************************************************/
-
-require('staff.inc.php');
+/*require('staff.inc.php');
 require_once(INCLUDE_DIR.'class.ticket.php');
 require_once(INCLUDE_DIR.'class.dept.php');
 require_once(INCLUDE_DIR.'class.filter.php');
 require_once(INCLUDE_DIR.'class.canned.php');
+*/
+require_once('core.php');
+require_once('tickets.class.php');
+$tickets = Tickets::init();
 
 
 $page='';
@@ -33,6 +22,7 @@ if($_REQUEST['id']) {
     }
 }
 //At this stage we know the access status. we can process the post.
+/*
 if($_POST && !$errors):
 
     if($ticket && $ticket->getId()) {
@@ -72,7 +62,7 @@ if($_POST && !$errors):
                 $errors['err']='Unable to post the reply. Correct the errors below and try again!';
             }
             break;
-        case 'transfer': /** Transfer ticket **/
+        case 'transfer': // Transfer ticket 
             //Check permission 
             if(!$thisstaff->canTransferTickets())
                 $errors['err']=$errors['transfer'] = 'Action Denied. You are not allowed to transfer tickets.';
@@ -147,7 +137,7 @@ if($_POST && !$errors):
                  }
              }
             break; 
-        case 'postnote': /* Post Internal Note */
+        case 'postnote': // Post Internal Note
             //Make sure the staff can set desired state
             if($_POST['state']) {
                 if($_POST['state']=='closed' && !$thisstaff->canCloseTickets())
@@ -443,9 +433,9 @@ if($_POST && !$errors):
     if(!$errors)
         $thisstaff ->resetStats(); //We'll need to reflect any changes just made!
 endif;
-
+*/
 /*... Quick stats ...*/
-$stats= $thisstaff->getTicketsStats();
+//$stats= $thisstaff->getTicketsStats();
 
 //Navigation
 $nav->setTabActive('tickets');
@@ -495,7 +485,7 @@ if($stats['overdue']) {
     if(!$sysnotice && $stats['overdue']>10)
         $sysnotice=$stats['overdue'] .' overdue tickets!';
 }
-
+/*
 if($thisstaff->showAssignedOnly() && $stats['closed']) {
     $nav->addSubMenu(array('desc'=>'My Closed Tickets ('.$stats['closed'].')',
                            'title'=>'My Closed Tickets',
@@ -518,8 +508,9 @@ if($thisstaff->canCreateTickets()) {
                         ($_REQUEST['a']=='open'));    
 }
 
-
+*/
 $inc = 'tickets.inc.php';
+/*
 if($ticket) {
     $ost->setPageTitle('Ticket #'.$ticket->getNumber());
     $nav->setActiveSubMenu(-1);
@@ -551,8 +542,8 @@ if($ticket) {
     if(!$_POST && !$_REQUEST['a'] && ($min=$thisstaff->getRefreshRate()))
         $ost->addExtraHeader('<meta http-equiv="refresh" content="'.($min*60).'" />');
 }
-
-require_once(STAFFINC_DIR.'header.inc.php');
-require_once(STAFFINC_DIR.$inc);
-require_once(STAFFINC_DIR.'footer.inc.php');
+*/
+require_once('header.inc.php');
+require_once($inc);
+require_once('footer.inc.php');
 ?>
