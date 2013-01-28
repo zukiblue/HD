@@ -53,7 +53,8 @@ class BaseDB {
     // Get 1 Record
     function loadRecord($id) {
         $sql='SELECT * FROM '.$this->table.' WHERE '.$this->primaryKeyField.'='.db_input($id);
-        $this->queryData($sql);
+
+        $this->record = $this->getRecordFromSQL($sql);
         return ($this->record);
     }
     // Execute and Test query
@@ -62,7 +63,7 @@ class BaseDB {
             $r = NULL;
         return ($r);
     }
-    function getRecord($sql) {        
+    function getRecordFromSQL($sql) {        
         $r = $this->queryData($sql);
         $this->record = mysql_fetch_array($r);
         return ($this->record);

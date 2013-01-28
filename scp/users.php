@@ -27,12 +27,12 @@ if ( $mode==='edit' ) {
             }elseif(!$errors['err']){
                 $errors['err']=lang(users_msg_upderror);
             }            
-            if($errors['err']) {            
+/*            if($errors['err']) {            
                 $mode = 'edit';
                 if ( !($rec = $users->loadRecord($_POST['id'])) ) {
                     $errors['err'] = 'Unknown or invalid ID.';
                 }
-            }
+            }*/
             break;
         case 'add':
             if(($id=$users->add($_POST,$errors))){

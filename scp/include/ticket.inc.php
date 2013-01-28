@@ -9,7 +9,6 @@ if($rec && $_REQUEST['a']!='add'){
     //$submit_text=lang(user_upd_submit);
     //$passwd_text=lang(user_upd_passtext);
     $info=$rec;
-echo var_dump($info['id']);
     //$info['id']=$user->id;
     //$info['teams'] = $user->getTeams();
 }else {
@@ -30,8 +29,8 @@ echo var_dump($info['id']);
 <form action="tickets.php" method="post" id="save"  enctype="multipart/form-data">
  <?php csrf_token(); ?>
  <input type="hidden" name="a" value="<?php echo $action; ?>">
- <input type="hidden" name="id" value="<?php echo $info['id']; ?>"> 
- <h2>Update Ticket# <?php /*echo $ticket->getExtId();*/ ?></h2>
+ <input type="hidden" name="id" value="<?php echo $info['ticket_id']; ?>"> 
+ <h2>Update Ticket# <?php echo $info['ticket_id']; ?></h2>
  <table class="form_table" width="940" border="0" cellspacing="0" cellpadding="2">
     <thead>
         <tr>
@@ -173,7 +172,7 @@ echo var_dump($info['id']);
                 echo Misc::timeDropdown($hr, $min, 'time');
                 ?>
                 &nbsp;<font class="error">&nbsp;<?php echo $errors['duedate']; ?>&nbsp;<?php echo $errors['time']; ?></font>
-                <em>Time is based on your time zone (GMT <?php echo $thisstaff->getTZoffset(); ?>)</em>
+                <em>Time is based on your time zone (GMT <?php /*echo $thisstaff->getTZoffset();*/ ?>)</em>
             </td>
         </tr>
         <tr>

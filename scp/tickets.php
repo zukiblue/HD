@@ -2,20 +2,17 @@
 require_once('core.php');
 require_once('tickets.class.php');
 $tickets = Tickets::init();
-$page='';
-$ticket=null; //clean start.
-//LOCKDOWN...See if the id provided is actually valid and if the user has access.
 
 $rec = null;
 $recs = null;
-
+//LOCKDOWN...See if the id provided is actually valid and if the user has access.
 setMode();
+
 if ( $mode==='edit' ) {
     if ( !($rec = $tickets->loadRecord($_GET['id'])) ) {
         $mode = 'browse';
         $errors['err'] = 'Unknown or invalid ID.';
     }
-    echo var_dump($rec['id']);
 
  //   elseif(!$ticket->checkStaffAccess($thisstaff)) {
  //       $errors['err']='Access denied. Contact admin if you believe this is in error';
@@ -25,17 +22,35 @@ if ( $mode==='edit' ) {
 } elseif ( $mode==='add' ) {
     // Do Nothing
     
-} elseif ($_POST){ //save  && !$errors
-    
-//At this stage we know the access status. we can process the post.
-//if($_POST && !$errors):
+} elseif ($_POST){ //save  && !$errors//At this stage we know the access status. we can process the post.
 
-    if($ticket && $ticket->getId()) {
+  //  if($ticket && $ticket->getId()) {
         //More coffee please.
-        $errors=array();
+        /*
+         * $errors=array();
         $lock=$ticket->getLock(); //Ticket lock if any
         $statusKeys=array('open'=>'Open','Reopen'=>'Open','Close'=>'Closed');
-        switch(strtolower($_POST['a'])):
+        */
+    switch(strtolower($_POST['a'])):
+        case 'upd':
+//            if(!$users){
+//                $errors['err']=lang(users_err_invalid);
+            if(!$users){
+                $errors['err']=lang(users_err_invalid);
+            }elseif($ticket->update($_POST,$errors)){
+                $msg=lang(users_msg_updok);
+                $msg='Ticket updated successfully';
+            }elseif(!$errors['err']){
+                $errors['err']=lang(users_msg_upderror);
+                $errors['err']='Unable to update the ticket. Correct the errors below and try again!';
+            }            
+
+            //if(!$ticket || !$thisstaff->canEditTickets())
+            //    $errors['err']='Perm. Denied. You are not allowed to edit tickets';
+                //Check to make sure the staff STILL has access post-update (e.g dept change).
+           //     if(!$ticket->checkStaffAccess($thisstaff))
+           //         $ticket=null;
+          break;
         case 'reply':
             if(!$thisstaff->canPostReply())
                 $errors['err'] = 'Action denied. Contact admin for access';
@@ -67,7 +82,9 @@ if ( $mode==='edit' ) {
                 $errors['err']='Unable to post the reply. Correct the errors below and try again!';
             }
             break;
-        case 'transfer': // Transfer ticket 
+        /*
+         case 'transfer': // Transfer ticket 
+         
             //Check permission 
             if(!$thisstaff->canTransferTickets())
                 $errors['err']=$errors['transfer'] = 'Action Denied. You are not allowed to transfer tickets.';
@@ -162,21 +179,11 @@ if ( $mode==='edit' ) {
                 $errors['postnote'] = 'Unable to post the note. Correct the error(s) below and try again!';
             }
             break;
-        case 'edit':
-        case 'update':
-            if(!$ticket || !$thisstaff->canEditTickets())
-                $errors['err']='Perm. Denied. You are not allowed to edit tickets';
-            elseif($ticket->update($_POST,$errors)) {
-                $msg='Ticket updated successfully';
-                $_REQUEST['a'] = null; //Clear edit action - going back to view.
-                //Check to make sure the staff STILL has access post-update (e.g dept change).
-                if(!$ticket->checkStaffAccess($thisstaff))
-                    $ticket=null;
-            } elseif(!$errors['err']) {
-                $errors['err']='Unable to update the ticket. Correct the errors below and try again!';
-            }
-            break;
-        case 'process':
+         
+         */
+        //case 'edit':
+        /*
+         case 'process':
             switch(strtolower($_POST['do'])):
                 case 'close':
                     if(!$thisstaff->canCloseTickets()) {
@@ -317,13 +324,15 @@ if ( $mode==='edit' ) {
                 default:
                     $errors['err']='You must select action to perform';
             endswitch;
+            
             break;
+         */
         default:
             $errors['err']='Unknown action';
         endswitch;
         if($ticket && is_object($ticket))
             $ticket->reload();//Reload ticket info following post processing
-    }
+   // }
     /*elseif($_POST['a']) {
 
         switch($_POST['a']) {

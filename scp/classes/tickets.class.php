@@ -10,14 +10,14 @@ class Tickets extends BaseDB{
     function Tickets() {
         parent::BaseDB();
         $this->table = TBL_TICKETS;
-        $this->tableAlias = 'ticket';
-        $this->sortOptions=array(
+        $this->tableAlias = 'tickets';
+       /* $this->sortOptions=array(
             'name'=>'users.name',
             'username'=>'users.username',
             'status'=>'users.active',
             'created'=>'users.creationdate',
-            'login'=>'users.lastlogin');
-        $this->defaultColumnOrder = 'name,username';
+            'login'=>'users.lastlogin');*/
+        $this->defaultColumnOrder = '';
         //override
         $this->primaryKeyField='ticket_id';
         
@@ -59,11 +59,10 @@ class Tickets extends BaseDB{
 
         //echo $sql;
         $this->records = parent::queryData($sql);
-        //echo $sql;
-
+       
         return ($this->records);
     }
-
+/*
     function loadRecord($id) {
         $where='WHERE '.$this->tableAlias.'.'.$this->primaryKeyField.'='.db_input($id);
         $groupby = ''; //GROUP BY 
@@ -89,5 +88,7 @@ class Tickets extends BaseDB{
         
         return ($this->record);
     }
+
+ */
 }
 ?>

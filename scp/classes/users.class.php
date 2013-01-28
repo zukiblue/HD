@@ -30,7 +30,7 @@ class Users extends BaseDB{
         $groupby = ''; //GROUP BY 
        
         $sql="$this->select $this->from $where $groupby $this->orderby";
-        echo $sql;
+        //echo $sql;
 
         $this->records = parent::queryData($sql);
         
