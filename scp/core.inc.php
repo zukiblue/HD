@@ -271,5 +271,15 @@ $nav = new StaffNav($user);
 $ost->setWarning($sysnotice);
 $ost->setPageTitle('osTicket :: Staff Control Panel');
 
+// to use on childs
+function setMode() {
+    global $mode;
+    if ( isset($_GET['id']) )
+        $mode = 'edit';
+    elseif ( isset($_GET['a']) && strcasecmp($_GET['a'], 'add')===0 )
+        $mode = 'add';
+    else
+        $mode = 'browse';
+}
 
 ?>

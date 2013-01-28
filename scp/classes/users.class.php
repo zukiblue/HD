@@ -21,19 +21,18 @@ class Users extends BaseDB{
         return;
     }   
 
-    function load($sortCol, $sortOrd) {
-        parent::load($sortCol, $sortOrd);
+    function load($sortCol, $sortOrd, $start=0, $limit=999999) {
+        parent::loadAll($sortCol, $sortOrd, $start, $limit);
+
 // ORDER BY $order_by LIMIT ".$pageNav->getStart().",".$pageNav->getLimit();
 
         $where='WHERE 1 ';
         $groupby = ''; //GROUP BY 
-        $limit1 ='';
-        $limit2 ='';
-
+       
         $sql="$this->select $this->from $where $groupby $this->orderby";
-        //echo $sql;
+        echo $sql;
 
-        parent::queryData($sql);
+        $this->records = parent::queryData($sql);
         
         return ($this->records);
     }

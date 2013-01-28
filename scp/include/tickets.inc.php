@@ -292,7 +292,7 @@ $negorder=$order=='DESC'?'ASC':'DESC'; //Negate the sorting..
 */
 //YOU BREAK IT YOU FIX IT.
 $tickets=Tickets::init();
-$res = $tickets->load($_REQUEST['sort'], $_REQUEST['order']);
+$res = $tickets->loadAll($_REQUEST['sort'], $_REQUEST['order']);
 ?>
 <!-- SEARCH FORM START -->
 <div id='basic_search'>

@@ -59,7 +59,7 @@ if(basename($_SERVER['SCRIPT_NAME'])==basename(__FILE__)) die('Access denied @'.
 <?php
 
 $qstr='';
-$users=Users::init();
+//$users=Users::init();
 $res = $users->load($_REQUEST['sort'], $_REQUEST['order']);
 // CSS & Qry string
 $qstr.='&order='.$users->getReverseOrder();

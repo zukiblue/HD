@@ -3,16 +3,14 @@
 if(basename($_SERVER['SCRIPT_NAME'])==basename(__FILE__)) die('Access denied @'.basename(__FILE__));
 
 $info=array();
-$qstr='';
-if($user && $_REQUEST['a']!='add'){
+if($rec && $_REQUEST['a']!='add'){
     $title=lang(user_upd_title);
     $action='upd';
     $submit_text=lang(user_upd_submit);
     $passwd_text=lang(user_upd_passtext);
-    $info=$user;
+    $info=$rec;
     //$info['id']=$user->id;
     //$info['teams'] = $user->getTeams();
-    //$qstr.='&id='.$info['id'];
 }else {
     $title=lang(user_add_title);
     $action='add';
@@ -23,16 +21,14 @@ if($user && $_REQUEST['a']!='add'){
     $info['isactive']=1;
     $info['isvisible']=1;
     $info['isadmin']=0; 
-    //$qstr.='&a=add';
 }
 $info=Format::htmlchars(($errors && $_POST)?$_POST:$info);
 
 ?>
 
-<form action="users.php?<?php echo $qstr; ?>" method="post" id="save" autocomplete="off">
+<form action="users.php" method="post" id="save" autocomplete="off">
  <?php csrf_token(); ?>
  <input type="hidden" name="a" value="<?php echo $action; ?>">
- <input type="hidden" name="aaaaaaaaaaaaaaa" value="<?php echo Format::htmlchars($_REQUEST['a']); ?>">
  <input type="hidden" name="id" value="<?php echo $info['id']; ?>">
  <h2><?php echo lang('user_title');?></h2>
  <table class="form_table" width="940" border="0" cellspacing="0" cellpadding="2">

@@ -3,16 +3,13 @@ require_once('core.php');
 require_once('users.class.php');
 $users = Users::init();
 
-$user = null;
-if ( isset($_GET['id']) )
-    $mode = 'edit';
-elseif ( isset($_GET['a']) && strcasecmp($_GET['a'], 'add')===0 )
-    $mode = 'add';
-else
-    $mode = 'browse';
+$rec = null;
+$recs = null;
+
+setMode();
 
 if ( $mode==='edit' ) {
-    if ( !($user = $users->get($_GET['id'])) ) {
+    if ( !($rec = $users->loadRecord($_GET['id'])) ) {
         $mode = 'browse';
         $errors['err'] = 'Unknown or invalid ID.';
     }
@@ -32,7 +29,7 @@ if ( $mode==='edit' ) {
             }            
             if($errors['err']) {            
                 $mode = 'edit';
-                if ( !($user = $users->get($_POST['id'])) ) {
+                if ( !($rec = $users->loadRecord($_POST['id'])) ) {
                     $errors['err'] = 'Unknown or invalid ID.';
                 }
             }

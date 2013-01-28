@@ -1,29 +1,34 @@
 <?php
-/*require('staff.inc.php');
-require_once(INCLUDE_DIR.'class.ticket.php');
-require_once(INCLUDE_DIR.'class.dept.php');
-require_once(INCLUDE_DIR.'class.filter.php');
-require_once(INCLUDE_DIR.'class.canned.php');
-*/
 require_once('core.php');
 require_once('tickets.class.php');
 $tickets = Tickets::init();
-
-
 $page='';
 $ticket=null; //clean start.
 //LOCKDOWN...See if the id provided is actually valid and if the user has access.
-if($_REQUEST['id']) {
-    if(!($ticket=Ticket::lookup($_REQUEST['id'])))
-         $errors['err']='Unknown or invalid ticket ID';
-    elseif(!$ticket->checkStaffAccess($thisstaff)) {
-        $errors['err']='Access denied. Contact admin if you believe this is in error';
-        $ticket=null; //Clear ticket obj.
+
+$rec = null;
+$recs = null;
+
+setMode();
+if ( $mode==='edit' ) {
+    if ( !($rec = $tickets->loadRecord($_GET['id'])) ) {
+        $mode = 'browse';
+        $errors['err'] = 'Unknown or invalid ID.';
     }
-}
+    echo var_dump($rec['id']);
+
+ //   elseif(!$ticket->checkStaffAccess($thisstaff)) {
+ //       $errors['err']='Access denied. Contact admin if you believe this is in error';
+ //       $ticket=null; //Clear ticket obj.
+ //  }
+    
+} elseif ( $mode==='add' ) {
+    // Do Nothing
+    
+} elseif ($_POST){ //save  && !$errors
+    
 //At this stage we know the access status. we can process the post.
-/*
-if($_POST && !$errors):
+//if($_POST && !$errors):
 
     if($ticket && $ticket->getId()) {
         //More coffee please.
@@ -318,7 +323,8 @@ if($_POST && !$errors):
         endswitch;
         if($ticket && is_object($ticket))
             $ticket->reload();//Reload ticket info following post processing
-    }elseif($_POST['a']) {
+    }
+    /*elseif($_POST['a']) {
 
         switch($_POST['a']) {
             case 'mass_process':
@@ -429,7 +435,10 @@ if($_POST && !$errors):
                 }
                 break;
         }
-    }
+ 
+    }*/
+}
+/*
     if(!$errors)
         $thisstaff ->resetStats(); //We'll need to reflect any changes just made!
 endif;
@@ -509,7 +518,12 @@ if($thisstaff->canCreateTickets()) {
 }
 
 */
-$inc = 'tickets.inc.php';
+//$inc = 'tickets.inc.php';
+
+if ($mode==='edit' || $mode==='add') // || $user || ($_REQUEST['a'] && !strcasecmp($_REQUEST['a'],'add')))
+    $page='ticket.inc.php';
+else
+    $page='tickets.inc.php';
 /*
 if($ticket) {
     $ost->setPageTitle('Ticket #'.$ticket->getNumber());
@@ -544,6 +558,6 @@ if($ticket) {
 }
 */
 require_once('header.inc.php');
-require_once($inc);
+require_once($page);
 require_once('footer.inc.php');
 ?>

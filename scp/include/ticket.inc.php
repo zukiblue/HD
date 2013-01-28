@@ -1,20 +1,43 @@
 <?php
-if(!defined('OSTSCPINC') || !$thisstaff || !$thisstaff->canEditTickets() || !$ticket) die('Access Denied');
+// Protect from direct request
+if(basename($_SERVER['SCRIPT_NAME'])==basename(__FILE__)) die('Access denied @'.basename(__FILE__));
 
-$info=Format::htmlchars(($errors && $_POST)?$_POST:$ticket->getUpdateInfo());
-?>
-<form action="tickets.php?id=<?php echo $ticket->getId(); ?>&a=edit" method="post" id="save"  enctype="multipart/form-data">
+$info=array();
+if($rec && $_REQUEST['a']!='add'){
+    $title=lang(ticket_upd_title);
+    $action='upd';
+    //$submit_text=lang(user_upd_submit);
+    //$passwd_text=lang(user_upd_passtext);
+    $info=$rec;
+echo var_dump($info['id']);
+    //$info['id']=$user->id;
+    //$info['teams'] = $user->getTeams();
+}else {
+    $title=lang(ticket_add_title);
+    $action='add';
+   // $submit_text=lang(user_add_submit);
+   // $passwd_text=lang(user_add_passtext).'&nbsp;<span class="error">&nbsp;*</span>';
+    //defaults for new user
+    $info['change_passwd']=1;
+    $info['isactive']=1;
+    $info['isvisible']=1;
+    $info['isadmin']=0; 
+}
+//echo var_dump($info);
+//$info=Format::htmlchars(($errors && $_POST)?$_POST:$info);
+//$info=Format::htmlchars(($errors && $_POST)?$_POST:$ticket->getUpdateInfo());
+//?>
+<form action="tickets.php" method="post" id="save"  enctype="multipart/form-data">
  <?php csrf_token(); ?>
- <input type="hidden" name="do" value="update">
- <input type="hidden" name="a" value="edit">
- <input type="hidden" name="id" value="<?php echo $ticket->getId(); ?>">
- <h2>Update Ticket# <?php echo $ticket->getExtId(); ?></h2>
+ <input type="hidden" name="a" value="<?php echo $action; ?>">
+ <input type="hidden" name="id" value="<?php echo $info['id']; ?>"> 
+ <h2>Update Ticket# <?php /*echo $ticket->getExtId();*/ ?></h2>
  <table class="form_table" width="940" border="0" cellspacing="0" cellpadding="2">
     <thead>
         <tr>
             <th colspan="2">
-                <h4>Ticket Update</h4>
-                <em><strong>User Information</strong>: Make sure the email address is valid.</em>
+                <h4>$title</h4>
+                <em><strong><?php echo lang('ticket_subtitle1');?></strong><?php echo lang('ticket_subtitle1_1');?></em>
             </th>
         </tr>
     </thead>

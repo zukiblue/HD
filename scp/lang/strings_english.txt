@@ -36,4 +36,9 @@ $user_form_realname= 'Real Name';
 $user_form_email   = 'Email';
 $user_form_level   = 'Access Level';
 $user_form_status  = 'Account Status';
+
+//Ticket
+$ticket_upd_title       = 'Ticket Update';
+$ticket_subtitle1   = 'User Information';
+$ticket_subtitle1_1 = ': Make sure the email address is valid.';
 ?>

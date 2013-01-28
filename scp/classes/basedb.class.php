@@ -22,7 +22,7 @@ class BaseDB {
         return;
     }   
     //
-    function load($sortCol, $sortOrd) {
+    function loadAll($sortCol, $sortOrd, $start=0, $limit=999999) {
         // is set
         if ($sortCol) $_sortCol = strtolower($sortCol);
         
@@ -47,13 +47,25 @@ class BaseDB {
 
         $this->select ='SELECT '.$this->tableAlias.'.* ';
         $this->from   ='FROM '.$this->table.' '.$this->tableAlias.' ';
-        $this->orderby='ORDER BY '.$ordercolumn.' '.$order.' ';  
+        $this->orderby='ORDER BY '.$ordercolumn.' '.$order.' '
+                .'LIMIT '.$start.','.$limit;
     }
+    // Get 1 Record
+    function loadRecord($id) {
+        $sql='SELECT * FROM '.$this->table.' WHERE '.$this->primaryKeyField.'='.db_input($id);
+        $this->queryData($sql);
+        return ($this->record);
+    }
+    // Execute and Test query
     function queryData($sql) {        
-        if(!($this->records=db_query($sql)) || !db_num_rows($this->records))
-            $this->records = NULL;
-
-        return ($this->records);
+        if(!($r=db_query($sql)) || !db_num_rows($r))
+            $r = NULL;
+        return ($r);
+    }
+    function getRecord($sql) {        
+        $r = $this->queryData($sql);
+        $this->record = mysql_fetch_array($r);
+        return ($this->record);
     }
     // Get Total Records
     function recordCountTotal() {        
@@ -67,17 +79,6 @@ class BaseDB {
     function getRecords() {
         return $this->records;
     }
-    // Get 1 Record
-    function get($id) {
-        $sql='SELECT * FROM '.$this->table.' WHERE '.$this->primaryKeyField.'='.db_input($id);
-
-        if(!($this->records=db_query($sql)) || !db_num_rows($this->records))
-            return NULL;
-        $this->record = mysql_fetch_array($this->records);
-        return ($this->record);
-    }
-
-
 }
 
 ?>
